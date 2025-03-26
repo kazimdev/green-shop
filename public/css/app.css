@@ -31279,6 +31279,14 @@ select {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+:root{
+  --color-deep-light:  #e9e9e9;
+}
+
+header{
+  min-height: 60px;
+}
+
 table form {
   display: inline-block;
 }
