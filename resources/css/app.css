@@ -2,7 +2,9 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-
+header{
+    min-height: 60px;
+}
 table form {
     display: inline-block;
 }

@@ -1,3 +1,3 @@
-# laravel-ecom
+# Shiny Shop
 
-An E-Commerce Web App created with Laravel
+## An E-Commerce Website created with Laravel + React
