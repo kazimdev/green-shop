@@ -23,6 +23,7 @@ mix.js('resources/js/app.js', 'public/js')
     files: [
         'resources/views/**/*.blade.php', // Watch Blade templates
         'resources/js/**/*.js',          // Watch JS files
+        'resources/js/**/*.jsx',          // Watch JSX files
         'resources/css/**/*.css',        // Watch CSS files
         'app/**/*.php',                  // Watch PHP files
         'routes/**/*.php',               // Watch Routes
