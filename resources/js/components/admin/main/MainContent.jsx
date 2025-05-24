@@ -1,9 +1,15 @@
-import React from 'react';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import Dashboard from "./Dashboard";
+import Products from "./Products";
 
 const MainContent = () => {
     return (
-        <div className='main-content w-3/4 p-4'>
-            Here is the Main Content
+        <div className="main-content w-4/5 p-4">
+            <Routes>
+                <Route path="/dashboard" element={<Dashboard></Dashboard>} />
+                 <Route path="/dashboard/products" element={<Products></Products>} />
+            </Routes>
         </div>
     );
 };
