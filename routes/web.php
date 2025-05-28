@@ -18,14 +18,15 @@ Route::get('/', function () {
     return view('frontend');
 });
 
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');
+
 // Catch-all route for React
-Route::get('/{any}', function () {
+Route::get('/dashboard/{any}', function () {
     return view('dashboard');
 })->where('any', '.*');
 
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->middleware(['auth'])->name('dashboard');
 
 
 // Users Routes
@@ -51,4 +52,4 @@ Route::get('/{any}', function () {
 // })->middleware(['auth'])->name('orders');
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

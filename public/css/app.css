@@ -31299,6 +31299,11 @@ table form {
   background: #F9FAFB;
 }
 
+.logo img {
+  max-width: 260px;
+  border-radius: 5px;
+}
+
 @media (min-width: 640px) {
   .sm\:container {
     width: 100%;

@@ -17,3 +17,7 @@ table form {
 .app-body {
     background: #F9FAFB;
 }
+.logo img {
+    max-width: 260px;
+    border-radius: 5px;
+}

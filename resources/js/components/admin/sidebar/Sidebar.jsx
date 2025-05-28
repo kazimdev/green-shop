@@ -1,5 +1,5 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
+import LogoutButton from '../../auth/LogoutButton';
 
 const Sidebar = () => {
     return (
@@ -12,7 +12,7 @@ const Sidebar = () => {
                 <li><Link to='/dashboard/staffs' className='py-3 block'>Our staffs</Link></li>
                 <li><Link to='/dashboard/settings' className='py-3 block'>Settings</Link></li>
                 <li><a href='/' target='_blank' className='py-3 block'>View Site</a></li>
-                <li><Link to='/dashboard/logout' className='py-3 block'>Logout</Link></li>
+                <li><LogoutButton></LogoutButton></li>
             </ul>
         </div>
     );
