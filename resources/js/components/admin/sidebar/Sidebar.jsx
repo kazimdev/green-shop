@@ -7,6 +7,7 @@ const Sidebar = () => {
             <ul>
                 <li> <Link to='/dashboard' className='py-3 block'>Dashboard</Link></li>
                 <li><Link to='/dashboard/products' className='py-3 block'>Products</Link></li>
+                <li><Link to='/dashboard/categories' className='py-3 block'>Categories</Link></li>
                 <li><Link to='/dashboard/orders' className='py-3 block'>Orders</Link></li>
                 <li><Link to='/dashboard/customers' className='py-3 block'>Customers</Link></li>
                 <li><Link to='/dashboard/staffs' className='py-3 block'>Our staffs</Link></li>

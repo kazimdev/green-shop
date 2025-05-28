@@ -1,4 +1,3 @@
-// components/LogoutButton.tsx
 import axios from "./axios";
 
 const LogoutButton = () => {

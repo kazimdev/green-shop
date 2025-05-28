@@ -1,7 +1,7 @@
-import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import Products from "./Products";
+import Categories from "./categories/Categories";
 
 const MainContent = () => {
     return (
@@ -9,6 +9,7 @@ const MainContent = () => {
             <Routes>
                 <Route path="/dashboard" element={<Dashboard></Dashboard>} />
                  <Route path="/dashboard/products" element={<Products></Products>} />
+                 <Route path="/dashboard/categories" element={<Categories></Categories>} />
             </Routes>
         </div>
     );
