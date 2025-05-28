@@ -49,7 +49,7 @@
         </div>
 
         <div class="w-1/2">
-            <img src="https://picsum.photos/600/600" alt="" srcset="" class="mx-auto rounded-lg">
+            <img src="https://picsum.photos/600/600" alt="" srcset="" width="600" class="mx-auto rounded-lg">
         </div>
     </div>
 

@@ -278,23 +278,22 @@ var LogoutButton = function LogoutButton() {
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
           case 0:
-            console.log("testing..");
-            _context.prev = 1;
-            _context.next = 4;
+            _context.prev = 0;
+            _context.next = 3;
             return _axios__WEBPACK_IMPORTED_MODULE_0__["default"].post("/logout");
-          case 4:
+          case 3:
             window.location.href = '/login';
-            _context.next = 10;
+            _context.next = 9;
             break;
-          case 7:
-            _context.prev = 7;
-            _context.t0 = _context["catch"](1);
+          case 6:
+            _context.prev = 6;
+            _context.t0 = _context["catch"](0);
             console.error("Logout failed:", _context.t0);
-          case 10:
+          case 9:
           case "end":
             return _context.stop();
         }
-      }, _callee, null, [[1, 7]]);
+      }, _callee, null, [[0, 6]]);
     }));
     return function handleLogout() {
       return _ref.apply(this, arguments);

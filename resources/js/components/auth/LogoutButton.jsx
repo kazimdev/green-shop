@@ -4,7 +4,6 @@ import axios from "./axios";
 const LogoutButton = () => {
 
     const handleLogout = async () => {
-        console.log("testing..");
         try {
             await axios.post("/logout");
 
