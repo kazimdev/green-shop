@@ -57,7 +57,7 @@ const Categories = () => {
     };
 
     loading && <p>Loading ...</p>;
-
+    
     return (
         <div className="categories flex gap-x-24">
             <form onSubmit={handleSubmit}>

@@ -4,7 +4,9 @@ const LogoutButton = () => {
 
     const handleLogout = async () => {
         try {
-            await axios.post("/logout");
+            await axios.get('/sanctum/csrf-cookie');
+
+            await axios.post("/api/logout");
 
             window.location.href = '/login';
 

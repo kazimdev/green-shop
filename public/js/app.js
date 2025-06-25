@@ -471,20 +471,23 @@ var LogoutButton = function LogoutButton() {
           case 0:
             _context.prev = 0;
             _context.next = 3;
-            return _axios__WEBPACK_IMPORTED_MODULE_0__["default"].post("/logout");
+            return _axios__WEBPACK_IMPORTED_MODULE_0__["default"].get('/sanctum/csrf-cookie');
           case 3:
+            _context.next = 5;
+            return _axios__WEBPACK_IMPORTED_MODULE_0__["default"].post("/api/logout");
+          case 5:
             window.location.href = '/login';
-            _context.next = 9;
+            _context.next = 11;
             break;
-          case 6:
-            _context.prev = 6;
+          case 8:
+            _context.prev = 8;
             _context.t0 = _context["catch"](0);
             console.error("Logout failed:", _context.t0);
-          case 9:
+          case 11:
           case "end":
             return _context.stop();
         }
-      }, _callee, null, [[0, 6]]);
+      }, _callee, null, [[0, 8]]);
     }));
     return function handleLogout() {
       return _ref.apply(this, arguments);

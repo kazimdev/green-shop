@@ -24,7 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('categories', CategoryController::class);
 });
 
-Route::middleware('auth:api')->post('/logout', function (Request $request) {
+Route::middleware('auth')->post('/logout', function (Request $request) {
     Auth::logout();
     $request->session()->invalidate();
     $request->session()->regenerateToken();

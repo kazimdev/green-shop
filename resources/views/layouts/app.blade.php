@@ -43,7 +43,7 @@
         </main>
 
         <footer class="bg-white py-6 px-4 sm:px-6 lg:px-8">
-            <p class="text-center">&copy; 2024 | ShinyEcom - All rights reserved.</p>
+            <p class="text-center">&copy; 2025 | GreenShop - All rights reserved.</p>
         </footer>
     </div>
 

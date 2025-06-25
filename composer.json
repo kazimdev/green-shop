@@ -1,8 +1,8 @@
 {
-    "name": "laravel/ecommerce",
+    "name": "laravel/greenshop",
     "type": "project",
     "description": "Laravel Ecommerce Website.",
-    "keywords": ["ecommerce", "laravel"],
+    "keywords": ["ecommerce", "laravel", "shop", "greenshop"],
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
