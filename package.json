@@ -19,6 +19,7 @@
         "browser-sync": "^3.0.3",
         "browser-sync-webpack-plugin": "^2.3.0",
         "css-loader": "^5.2.7",
+        "daisyui": "^5.0.43",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.19",
         "postcss": "^8.5.1",
