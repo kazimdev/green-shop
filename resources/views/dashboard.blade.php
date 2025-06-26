@@ -7,16 +7,15 @@
 
     <title>Dashboard | Laravel Ecom</title>
 
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+    @viteReactRefresh
+    @vite(['resources/css/app.css', 'resources/js/app.jsx'])
 </head>
 
 <body>
     <div id="app-dashboard"></div>
-
-    <script src="{{ asset('js/app.js') }}"></script>
 </body>
 
 </html>
