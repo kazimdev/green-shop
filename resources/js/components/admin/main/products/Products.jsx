@@ -1,0 +1,52 @@
+import { Link } from 'react-router-dom';
+
+const Products = () => {
+    return (
+        <>
+            <div className="products-header mb-4">
+                <h2 className="inline-block text-2xl font-bold mr-3">
+                    Products{" "}
+                </h2>
+
+                <Link to='/dashboard/products/add' className='bg-blue-500 px-4 py-2 rounded-full text-white'>Add New Product</Link>
+            </div>
+
+            <div className="products-filters bg-white px-4 py-3 shadow-sm mb-4 rounded-sm">
+                Product Filters
+            </div>
+
+            <div className="products-list  bg-white px-4 py-3 shadow-sm mb-4 rounded-sm">
+                <table className="table-auto w-full text-left">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Image</th>
+                            <th>Product</th>
+                            <th>Type</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#ID: 1026</td>
+                            <td>
+                                <img src="" alt="" />
+                            </td>
+                            <td>Product Title</td>
+                            <td>Simple</td>
+                            <td>$50.00</td>
+                            <td>100</td>
+                            <td>Published</td>
+                            <td>Edit | Preview | Delete</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </>
+    );
+};
+
+export default Products;
