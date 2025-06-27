@@ -1,4 +1,3 @@
-import React from "react";
 
 import Logo from "../../../../images/Logo.png";
 

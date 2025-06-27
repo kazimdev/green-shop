@@ -21,3 +21,16 @@ table form {
     max-width: 260px;
     border-radius: 5px;
 }
+
+/* Admin */
+.products-list table thead th,
+.products-list table tbody td {
+    padding: 15px ;
+}
+
+.products-list table tbody tr:nth-child(n) {
+    background: #f4f4f4;
+}
+.products-list table tbody tr:nth-child(2n) {
+    background: #ffffff;
+}

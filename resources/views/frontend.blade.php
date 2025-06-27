@@ -5,19 +5,21 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Shiny Shop</title>
-
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <title>Green Shop</title>
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+    @viteReactRefresh
+    @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+
 </head>
 
 <body>
     <header class="relative bg-gray-100 dark:bg-gray-900 py-2">
         <div class="container mx-auto flex items-top justify-between sm:items-center sm:pt-0">
             <div class="logo">
-                <h1> Shiny Shop </h1>
+                <h1> Green Shop </h1>
             </div>
 
             <form class="search w-1/3" method="GET">

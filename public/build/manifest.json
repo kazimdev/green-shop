@@ -1,0 +1,38 @@
+{
+  "_router-DI_KdNQv.js": {
+    "file": "assets/router-DI_KdNQv.js",
+    "name": "router",
+    "imports": [
+      "_vendor-SIwY82C9.js"
+    ]
+  },
+  "_vendor-SIwY82C9.js": {
+    "file": "assets/vendor-SIwY82C9.js",
+    "name": "vendor"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-Ni1Ltozv.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/images/Logo.png": {
+    "file": "assets/Logo-BsElgYno.png",
+    "src": "resources/images/Logo.png"
+  },
+  "resources/js/app.jsx": {
+    "file": "assets/app-Dh2LS0Uu.js",
+    "name": "app",
+    "src": "resources/js/app.jsx",
+    "isEntry": true,
+    "imports": [
+      "_vendor-SIwY82C9.js",
+      "_router-DI_KdNQv.js"
+    ],
+    "css": [
+      "assets/app-Ni1Ltozv.css"
+    ],
+    "assets": [
+      "assets/Logo-BsElgYno.png"
+    ]
+  }
+}

@@ -1,6 +1,9 @@
-const defaultTheme = require("tailwindcss/defaultTheme");
+import forms from '@tailwindcss/forms';
+import daisyui from 'daisyui';
+import defaultTheme from 'tailwindcss/defaultTheme';
 
-module.exports = {
+/** @type {import('tailwindcss').Config} */
+export default {
     content: [
         "./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php",
         "./storage/framework/views/*.php",
@@ -16,7 +19,7 @@ module.exports = {
             },
             colors: {
                 customGray: {
-                    500: "#6b7280", // Ensure 500-level shades exist
+                    500: "#6b7280",
                 },
             },
         },
@@ -25,11 +28,20 @@ module.exports = {
         },
     },
 
-    variants: {
-        extend: {
-            opacity: ["disabled"],
-        },
-    },
+    plugins: [
+        forms,
+        daisyui,
+    ],
 
-    plugins: [require("@tailwindcss/forms")],
+    // DaisyUI configuration
+    daisyui: {
+        themes: ["light", "dark"],
+        darkTheme: "dark",
+        base: true,
+        styled: true,
+        utils: true,
+        prefix: "",
+        logs: true,
+        themeRoot: ":root",
+    },
 };
