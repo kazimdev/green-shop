@@ -23,6 +23,10 @@ table form {
 }
 
 /* Admin */
+.sidebar ul li a.active {
+    background: #243a48;
+    border-radius: 3px;
+}
 .products-list table thead th,
 .products-list table tbody td {
     padding: 15px ;

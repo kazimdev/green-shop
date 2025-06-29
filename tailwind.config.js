@@ -1,6 +1,6 @@
-import forms from '@tailwindcss/forms';
-import daisyui from 'daisyui';
-import defaultTheme from 'tailwindcss/defaultTheme';
+import forms from "@tailwindcss/forms";
+import daisyui from "daisyui";
+import defaultTheme from "tailwindcss/defaultTheme";
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -21,6 +21,10 @@ export default {
                 customGray: {
                     500: "#6b7280",
                 },
+
+                primary: {
+                    DEFAULT: "#2f4858",
+                },
             },
         },
         container: {
@@ -28,10 +32,7 @@ export default {
         },
     },
 
-    plugins: [
-        forms,
-        daisyui,
-    ],
+    plugins: [forms, daisyui],
 
     // DaisyUI configuration
     daisyui: {
