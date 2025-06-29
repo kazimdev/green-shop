@@ -25,6 +25,11 @@ export default {
                 primary: {
                     DEFAULT: "#2f4858",
                 },
+                base: {
+                    DEFAULT: "#2F4858",
+                    dark: "#2F4858",
+                    light: "rgb(240 247 255)"
+                },
             },
         },
         container: {

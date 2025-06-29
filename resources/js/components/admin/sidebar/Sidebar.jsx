@@ -10,7 +10,7 @@ const Sidebar = () => {
               
                 <li> <Link to='/dashboard' className={location.pathname === '/dashboard' ? 'py-3 px-2 block active' : 'py-3 px-2 block'}>Dashboard</Link></li>
 
-                <li><Link to='/dashboard/products' className={location.pathname === '/dashboard/products' ? 'py-3 px-2 block active' : 'py-3 px-2 block'}>Products</Link></li>
+                <li><Link to='/dashboard/products' className={ location.pathname === '/dashboard/products' ? 'py-3 px-2 block active' : 'py-3 px-2 block'}>Products</Link></li>
 
                 <li><Link to='/dashboard/categories' className={location.pathname === '/dashboard/categories' ? 'py-3 px-2 block active' : 'py-3 px-2 block'}>Categories</Link></li>
 
