@@ -7,7 +7,10 @@ const Sidebar = () => {
 
     const activeClasses = "flex gap-2 items-center p-3 mb-2 active";
     const inactiveClasses = "flex gap-2 items-center p-3 mb-2";
-    const isActive = (path) => activePath === path;
+
+    // check if the current path includes the given path
+
+    const isActive = (path) => activePath === path || (path != "/dashboard" && activePath.startsWith(path));
 
     const pointer = (
         <div className="inline-grid *:[grid-area:1/1]">

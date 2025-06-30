@@ -16,9 +16,11 @@ class Product extends Model
      */
     protected $table = 'products';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
+    
 }
