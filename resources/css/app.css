@@ -1,9 +1,26 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
-:root{
-    --color-deep-light:  #e9e9e9;
+:root {
+    --color-deep-light: #e9e9e9;
+
+    --brand-green-50: #e7f4ec;
+    --brand-green-100: #cdead9;
+    --brand-green-200: #a0d4b3;
+    --brand-green-300: #72be8d;
+    --brand-green-400: #4ba86c;
+    --brand-green-500: #1f763b; /* Base */
+    --brand-green-600: #196633;
+    --brand-green-700: #13532a;
+    --brand-green-800: #0e4021;
+    --brand-green-900: #0a2d18;
+}
+[type="checkbox"]:checked:hover,
+[type="checkbox"]:checked:focus {
+    background: var(--color-accent);
+    border: 0;
+    outline: 0;
 }
 header {
     min-height: 60px;
@@ -15,7 +32,7 @@ table form {
 }
 
 .app-body {
-    background: #F9FAFB;
+    background: #f9fafb;
 }
 .logo img {
     max-width: 260px;
@@ -29,7 +46,7 @@ table form {
 }
 .products-list table thead th,
 .products-list table tbody td {
-    padding: 15px ;
+    padding: 15px;
 }
 
 .products-list table tbody tr:nth-child(n) {
@@ -39,8 +56,16 @@ table form {
     background: #ffffff;
 }
 
-
 .add-product-form label span {
     display: inline-block;
     width: 180px;
+}
+form.add-product-form .label input, 
+form.add-product-form .label textarea,
+form.add-product-form .label input,
+form.add-product-form .label .relative{
+    width: 70%;
+}
+form.add-product-form .label .relative input{
+    width: 100%;
 }

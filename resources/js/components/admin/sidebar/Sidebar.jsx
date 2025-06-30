@@ -3,28 +3,49 @@ import LogoutButton from '../../auth/LogoutButton';
 
 const Sidebar = () => {
       const location = useLocation();
+      const activePath = location.pathname;
 
+      const activeClasses = 'flex gap-2 items-center p-3 mb-2 active';
+      const inactiveClasses = 'flex gap-2 items-center p-3 mb-2';
+      const isActive = (path) => activePath === path;
+    
+      const pointer = <div className="inline-grid *:[grid-area:1/1]">
+                        <div className="status status-info animate-ping"></div>
+                        <div className="status status-info"></div>
+                    </div>;
+
+    const routes = {
+        '/dashboard' : 'Dashboard',
+        '/dashboard/products' : 'Products',
+        '/dashboard/categories' : 'Categories',
+        '/dashboard/orders' : 'Orders',
+        '/dashboard/customers' : 'Customers',
+        '/dashboard/staffs' : 'Our staffs',
+        '/dashboard/settings' : 'Settings',
+    }
+
+    const routeLinks = Object.keys(routes).map((route) => {
+        return (
+            <li key={route}>
+                <Link to={route} className={isActive(route) ? activeClasses : inactiveClasses}>
+                    {isActive(route) && pointer} {routes[route]}
+                </Link>
+            </li>
+        );
+    }
+
+    );
+
+    // Render the sidebar with the links
     return (
         <div className='sidebar w-1/6 bg-[#2f4858] p-4'>
             <ul>
-              
-                <li> <Link to='/dashboard' className={location.pathname === '/dashboard' ? 'py-3 px-2 block active' : 'py-3 px-2 block'}>Dashboard</Link></li>
+                {routeLinks}
 
-                <li><Link to='/dashboard/products' className={ location.pathname === '/dashboard/products' ? 'py-3 px-2 block active' : 'py-3 px-2 block'}>Products</Link></li>
+                <li><a href='/' target='_blank' className='flex gap
+                    -2 items-center p-3 mb-2'>View Site</a></li>
 
-                <li><Link to='/dashboard/categories' className={location.pathname === '/dashboard/categories' ? 'py-3 px-2 block active' : 'py-3 px-2 block'}>Categories</Link></li>
-
-                <li><Link to='/dashboard/orders' className={location.pathname === '/dashboard/orders' ? 'py-3 px-2 block active' : 'py-3 px-2 block'}>Orders</Link></li>
-
-                <li><Link to='/dashboard/customers' className={location.pathname === '/dashboard/customers' ? 'py-3 px-2 block active' : 'py-3 px-2 block'}>Customers</Link></li>
-
-                <li><Link to='/dashboard/staffs' className={location.pathname === '/dashboard/staffs' ? 'py-3 px-2 block active' : 'py-3 px-2 block'}>Our staffs</Link></li>
-
-                <li><Link to='/dashboard/settings' className={location.pathname === '/dashboard/settings' ? 'py-3 px-2 block active' : 'py-3 px-2 block'}>Settings</Link></li>
-
-                <li><a href='/' target='_blank' className={location.pathname === '/' ? 'py-3 px-2 block active' : 'py-3 px-2 block'}>View Site</a></li>
-                
-                <li><LogoutButton></LogoutButton></li>
+                <li><LogoutButton></LogoutButton></li>   
             </ul>
         </div>
     );

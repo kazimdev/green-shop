@@ -5,11 +5,6 @@ const Products = () => {
         <>
             <div className="products-header mb-4">
                 <h2 className="inline-flex items-center gap-3 text-2xl font-bold mr-3">
-                    <div className="inline-grid *:[grid-area:1/1]">
-                        <div className="status status-info animate-ping"></div>
-                        <div className="status status-info"></div>
-                    </div>
-
                     Products
                 </h2>
 
