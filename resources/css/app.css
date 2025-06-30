@@ -22,6 +22,14 @@
     border: 0;
     outline: 0;
 }
+.alert.alert-success {
+    background: #459256;
+    border: 0;
+}
+input, textarea, select {
+    font-size: 15px;
+    color: #161A20;
+}
 header {
     min-height: 60px;
     background: #fbfbfb;
@@ -59,12 +67,6 @@ table form {
 .add-product-form label span {
     display: inline-block;
     width: 180px;
-}
-form.add-product-form .label input, 
-form.add-product-form .label textarea,
-form.add-product-form .label input,
-form.add-product-form .label .relative{
-    width: 70%;
 }
 form.add-product-form .label .relative input{
     width: 100%;

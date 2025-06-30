@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Loader from "../../../ui/Loader";
 import axios from ".././../../auth/axios";
 
 const Categories = () => {
@@ -56,7 +57,7 @@ const Categories = () => {
         }
     };
 
-    loading && <p>Loading ...</p>;
+    loading && <Loader />;
     
     return (
         <div className="categories flex gap-x-24">
@@ -97,10 +98,12 @@ const Categories = () => {
                 )}
             </form>
 
+
+
             <div className="category-list">
                 <h2 className="text-xl font-bold">Categories</h2>
                 {loading ? (
-                    <p>Loading categories...</p>
+                     <Loader />
                 ) : (
                     <ul>
                         {categories.map((category) => (
