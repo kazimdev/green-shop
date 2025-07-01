@@ -13,16 +13,17 @@ class CreateProductsTable extends Migration
      */
      public function up() {
         Schema::create('products', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->string('slug')->unique();
-            $table->text('description')->nullable();
-            $table->decimal('price', 10, 2);
-            $table->integer('stock');
-            $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
-            $table->timestamps();
-        });
+        $table->id();
+        $table->string('title'); // required
+        $table->string('slug')->unique()->nullable();
+        $table->text('description')->nullable();
+        $table->decimal('price', 10, 2)->nullable();
+        $table->integer('stock')->nullable();
+        $table->enum('status', ['active', 'inactive'])->default('active');
+        $table->foreignId('category_id')->nullable()->constrained()->cascadeOnDelete();
+        $table->timestamps();
+    });
+
     }
 
     /**
