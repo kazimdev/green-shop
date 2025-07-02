@@ -16,32 +16,56 @@ const AddProduct = () => {
 
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [imagePreviews, setImagePreviews] = useState([]);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [galleryPreviews, setGalleryPreviews] = useState([]);
 
-    const handleImagePreview = (e) => {
-        const files = Array.from(e.target.files);
-        const previews = files.map((file) => URL.createObjectURL(file));
-        setImagePreviews(previews);
+    const handleImagePreview = (e, type) => {
+        if (type === 'primary') {
+            const file = e.target.files[0];
+            if (file) {
+                setImagePreview(URL.createObjectURL(file));
+            }
+        } else {
+            const files = Array.from(e.target.files);
+            const previews = files.map((file) => URL.createObjectURL(file));
+            setGalleryPreviews(previews);
+        }
     };
 
     // Submit handler
     const onSubmit = async (data) => {
         setLoading(true);
 
-        console.log(data);
+        const formData = new FormData();
+        Object.keys(data).forEach((key) => {
+            if (key === 'image') {
+                formData.append('image', data.image[0]);
+            } else if (key === 'gallery') {
+                Array.from(data.gallery).forEach((file) => {
+                    formData.append('gallery[]', file);
+                });
+            } else {
+                formData.append(key, data[key]);
+            }
+        });
 
         await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie", {
             withCredentials: true,
         });
 
         try {
-            await axios.post("http://127.0.0.1:8000/api/products", data, {
+            await axios.post("http://127.0.0.1:8000/api/products", formData, {
                 withCredentials: true,
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
             });
 
             setSuccess(true);
             setLoading(false);
             reset();
+            setImagePreview(null);
+            setGalleryPreviews([]);
         } catch (err) {
             setSuccess(false);
             setLoading(false);
@@ -223,17 +247,40 @@ const AddProduct = () => {
                         </fieldset>
 
                         <fieldset className="fieldset product-image w-1/2 p-4">
-                            <label htmlFor="images">Product Image</label>
+                            <label htmlFor="image">Product Image</label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                {...register("image")}
+                                onChange={(e) => handleImagePreview(e, 'primary')}
+                                className="file-input file-input-ghost"
+                            />
+
+                            {imagePreview && (
+                                <div style={{ marginTop: "10px" }}>
+                                    <img
+                                        src={imagePreview}
+                                        alt="Preview"
+                                        style={{
+                                            width: "400px",
+                                            height: "400px",
+                                            objectFit: "cover",
+                                        }}
+                                    />
+                                </div>
+                            )}
+
+                            <label htmlFor="gallery" className="mt-12">Product Gallery</label>
                             <input
                                 type="file"
                                 multiple
                                 accept="image/*"
-                                {...register("images")}
-                                onChange={(e) => handleImagePreview(e)}
-                                className="file-input file-input-ghost" 
+                                {...register("gallery")}
+                                onChange={(e) => handleImagePreview(e, 'gallery')}
+                                className="file-input file-input-ghost"
                             />
 
-                            {imagePreviews.length > 0 && (
+                            {galleryPreviews.length > 0 && (
                                 <div
                                     style={{
                                         display: "flex",
@@ -241,7 +288,7 @@ const AddProduct = () => {
                                         marginTop: "10px",
                                     }}
                                 >
-                                    {imagePreviews.map((src, i) => (
+                                    {galleryPreviews.map((src, i) => (
                                         <img
                                             key={i}
                                             src={src}
@@ -284,3 +331,4 @@ const AddProduct = () => {
 };
 
 export default AddProduct;
+''

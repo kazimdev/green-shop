@@ -30,8 +30,8 @@ class ProductController extends Controller
             'stock' => 'nullable|integer|min:0',
             'status' => 'required|in:active,inactive',
             'category_id' => 'nullable|exists:categories,id',
-            'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpg,jpeg,png|max:2048',
+            'image' => 'nullable|array',
+            'gallery.*' => 'image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $validated['slug'] = empty($validated['slug']) ? Str::slug($validated['title']) : $validated['slug'];
@@ -39,15 +39,11 @@ class ProductController extends Controller
         $product = Product::create($validated);
 
         // Handle multiple images
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('products', 'public');
-
+        if ($request->hasFile('image')) {
                 $product->images()->create([
                     'image_url' => $path,
                     'is_primary' => $index === 0,
                 ]);
-            }
         }
 
         return response()->json($product, 201);
