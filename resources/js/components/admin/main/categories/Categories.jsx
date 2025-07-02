@@ -14,6 +14,11 @@ const Categories = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
+                // 👇 Call Sanctum CSRF endpoint first
+                await axios.get('http://127.0.0.1:8000/sanctum/csrf-cookie', {
+                    withCredentials: true,
+                });
+
                 const response = await axios.get(
                     "http://127.0.0.1:8000/api/categories",
                     {
@@ -58,7 +63,7 @@ const Categories = () => {
     };
 
     loading && <Loader />;
-    
+
     return (
         <div className="categories flex gap-x-24">
             <form onSubmit={handleSubmit}>
@@ -103,7 +108,7 @@ const Categories = () => {
             <div className="category-list">
                 <h2 className="text-xl font-bold">Categories</h2>
                 {loading ? (
-                     <Loader />
+                    <Loader />
                 ) : (
                     <ul>
                         {categories.map((category) => (
