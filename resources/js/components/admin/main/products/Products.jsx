@@ -10,15 +10,15 @@ const Products = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                // 👇 Call Sanctum CSRF endpoint first
-                await axios.get('http://127.0.0.1:8000/sanctum/csrf-cookie', {
+                // Call Sanctum CSRF endpoint first
+                await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie", {
                     withCredentials: true,
                 });
 
                 const response = await axios.get(
                     "http://127.0.0.1:8000/api/products",
                     {
-                        withCredentials: true, // Important for Sanctum
+                        withCredentials: true,
                     }
                 );
                 setProducts(response.data.data || response.data);
@@ -27,16 +27,16 @@ const Products = () => {
                 console.error("Failed to fetch products:", error);
                 setLoading(false);
             }
-        }
+        };
         fetchProducts();
     }, []);
 
     const getPrimaryImageUrl = (images) => {
-        const primary = images?.find(img => img.is_primary);
-        return primary ? `http://localhost:8000/storage/${primary.image_url}` : null;
+        const primary = images?.find((img) => img.is_primary);
+        return primary
+            ? `http://127.0.0.1:8000/storage/${primary.image_url}`
+            : null;
     };
-
-    console.log("Products:", products);
 
     return (
         <>
@@ -80,47 +80,69 @@ const Products = () => {
                             </tr>
                         ) : (
                             products.map((product) => {
-                                const imageUrl = getPrimaryImageUrl(product.images || []);
+                                const imageUrl = getPrimaryImageUrl(
+                                    product.images || []
+                                );
 
-                                return <tr key={product.id}>
-                                    <td>#{product.id}</td>
-                                    <td>
-                                        <img
-                                            src={imageUrl || "/images/no-image.webp"}
-                                            alt={product.title}
-                                            className="w-16 h-16 object-cover"
-                                        />
-                                    </td>
-                                    <td>{product.title}</td>
-                                    <td>{product.type}</td>
-                                    <td>{product?.price ? '$' + parseFloat(product.price).toFixed(2) : 'N/A'}</td>
-                                    <td>{product.stock}</td>
-                                    <td>{product.status}</td>
-                                    <td className="actions text-right">
-                                        <button className="edit mr-3"><img
-                                            src="/icons/edit.svg"
-                                            alt="Edit"
-                                            width={16}
-                                            height={16}
-                                        /></button>
-
-                                        <button className="preview mr-3"> <img
-                                            src="/icons/preview.svg"
-                                            alt="Preview"
-                                            width={16}
-                                            height={16}
-                                        /></button>
-
-                                        <button className="delete">
+                                return (
+                                    <tr key={product.id}>
+                                        <td>#{product.id}</td>
+                                        <td>
                                             <img
-                                                src="/icons/delete.svg"
-                                                alt="Delete"
-                                                width={16}
-                                                height={16}
+                                                src={
+                                                    imageUrl ||
+                                                    "/images/no-image.webp"
+                                                }
+                                                alt={product.title}
+                                                className="w-8 h-8 object-cover"
                                             />
-                                        </button>
-                                    </td>
-                                </tr>
+                                        </td>
+                                        <td>{product.title}</td>
+                                        <td>{product.type}</td>
+                                        <td>
+                                            {product?.price
+                                                ? "$" +
+                                                  parseFloat(
+                                                      product.price
+                                                  ).toFixed(2)
+                                                : "N/A"}
+                                        </td>
+                                        <td>{product.stock}</td>
+                                        <td>{product.status}</td>
+                                        <td className="actions text-right">
+                                            <Link
+                                                to={`/dashboard/products/edit/${product.id}`}
+                                                className="edit mr-3"
+                                            >
+                                                <img
+                                                    src="/icons/edit.svg"
+                                                    alt="Edit"
+                                                    width={16}
+                                                    height={16}
+                                                />
+                                            </Link>
+
+                                            <button className="preview mr-3">
+                                                {" "}
+                                                <img
+                                                    src="/icons/preview.svg"
+                                                    alt="Preview"
+                                                    width={16}
+                                                    height={16}
+                                                />
+                                            </button>
+
+                                            <button className="delete">
+                                                <img
+                                                    src="/icons/delete.svg"
+                                                    alt="Delete"
+                                                    width={16}
+                                                    height={16}
+                                                />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
                             })
                         )}
                     </tbody>

@@ -15,7 +15,7 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with('images')->get();
-        
+
         return response()->json($products);
     }
 
@@ -58,7 +58,9 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $product = Product::with('images')->findOrFail($id);
+
+        return response()->json($product);
     }
 
     /**
@@ -66,7 +68,59 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $product = Product::findOrFail($id);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'slug' => 'nullable|string|max:255|unique:products,slug,' . $id,
+            'price' => 'nullable|numeric|min:0',
+            'stock' => 'nullable|integer|min:0',
+            'status' => 'required|in:active,inactive',
+            'category_id' => 'nullable|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'gallery.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $validated['slug'] = empty($validated['slug']) ? Str::slug($validated['title']) : $validated['slug'];
+
+        $product->update($validated);
+
+        // Handle primary image update
+        if ($request->hasFile('image')) {
+            // Remove old primary image if exists
+            $oldPrimary = $product->images()->where('is_primary', true)->first();
+            if ($oldPrimary) {
+                $oldPrimary->delete();
+            }
+            $path = $request->file('image')->store('products', 'public');
+            $product->images()->create([
+                'image_url' => $path,
+                'is_primary' => true,
+            ]);
+        } elseif ($request->filled('current_image')) {
+            // If no new image uploaded, ensure the current image remains primary
+            $currentImage = $product->images()->where('image_url', $request->input('current_image'))->first();
+            if ($currentImage) {
+                // Set all images to not primary first
+                $product->images()->update(['is_primary' => false]);
+                $currentImage->is_primary = true;
+                $currentImage->save();
+            }
+        }
+
+        // Handle gallery images update (optional: clear and re-add, or just add new)
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $file) {
+                $path = $file->store('products', 'public');
+                $product->images()->create([
+                    'image_url' => $path,
+                    'is_primary' => false,
+                ]);
+            }
+        }
+
+        return response()->json($product->load('images'));
     }
 
     /**
