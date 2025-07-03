@@ -31,6 +31,11 @@ const Products = () => {
         fetchProducts();
     }, []);
 
+    const getPrimaryImageUrl = (images) => {
+        const primary = images?.find(img => img.is_primary);
+        return primary ? `http://localhost:8000/storage/${primary.image_url}` : null;
+    };
+
     console.log("Products:", products);
 
     return (
@@ -74,12 +79,14 @@ const Products = () => {
                                 </td>
                             </tr>
                         ) : (
-                            products.map((product) => (
-                                <tr key={product.id}>
+                            products.map((product) => {
+                                const imageUrl = getPrimaryImageUrl(product.images || []);
+
+                                return <tr key={product.id}>
                                     <td>#{product.id}</td>
                                     <td>
                                         <img
-                                            src={product.image || "/images/no-image.webp"}
+                                            src={imageUrl || "/images/no-image.webp"}
                                             alt={product.title}
                                             className="w-16 h-16 object-cover"
                                         />
@@ -114,7 +121,7 @@ const Products = () => {
                                         </button>
                                     </td>
                                 </tr>
-                            ))
+                            })
                         )}
                     </tbody>
                 </table>

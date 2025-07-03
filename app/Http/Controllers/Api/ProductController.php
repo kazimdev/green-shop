@@ -14,7 +14,9 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return Product::all();
+        $products = Product::with('images')->get();
+        
+        return response()->json($products);
     }
 
     /**
@@ -30,7 +32,7 @@ class ProductController extends Controller
             'stock' => 'nullable|integer|min:0',
             'status' => 'required|in:active,inactive',
             'category_id' => 'nullable|exists:categories,id',
-            'image' => 'nullable|array',
+            'image' => 'image|mimes:jpg,jpeg,png|max:2048',
             'gallery.*' => 'image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
@@ -40,10 +42,12 @@ class ProductController extends Controller
 
         // Handle multiple images
         if ($request->hasFile('image')) {
-                $product->images()->create([
-                    'image_url' => $path,
-                    'is_primary' => $index === 0,
-                ]);
+            $path = $request->file('image')->store('products', 'public');
+
+            $product->images()->create([
+                'image_url' => $path,
+                'is_primary' => true,
+            ]);
         }
 
         return response()->json($product, 201);
