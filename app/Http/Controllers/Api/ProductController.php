@@ -30,24 +30,35 @@ class ProductController extends Controller
             'slug' => 'nullable|string|max:255',
             'price' => 'nullable|numeric|min:0',
             'stock' => 'nullable|integer|min:0',
-            'status' => 'required|in:active,inactive',
+            'status' => 'nullable|in:active,inactive',
             'category_id' => 'nullable|exists:categories,id',
-            'image' => 'image|mimes:jpg,jpeg,png|max:2048',
-            'gallery.*' => 'image|mimes:jpg,jpeg,png|max:2048',
+            'image' => 'nullable|file|image|mimes:jpg,jpeg,png|max:2048',
+            'gallery' => 'nullable|array',
+            'gallery.*' => 'file|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $validated['slug'] = empty($validated['slug']) ? Str::slug($validated['title']) : $validated['slug'];
 
         $product = Product::create($validated);
 
-        // Handle multiple images
+        // Save primary image (optional)
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('products', 'public');
-
             $product->images()->create([
                 'image_url' => $path,
                 'is_primary' => true,
             ]);
+        }
+
+        // Save gallery images (optional)
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $index => $file) {
+                $path = $file->store('products', 'public');
+                $product->images()->create([
+                    'image_url' => $path,
+                    'is_primary' => false, // keep primary as `image` only
+                ]);
+            }
         }
 
         return response()->json($product, 201);
@@ -76,10 +87,12 @@ class ProductController extends Controller
             'slug' => 'nullable|string|max:255|unique:products,slug,' . $id,
             'price' => 'nullable|numeric|min:0',
             'stock' => 'nullable|integer|min:0',
-            'status' => 'required|in:active,inactive',
+            'status' => 'nullable|in:active,inactive',
             'category_id' => 'nullable|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'gallery.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'image' => 'nullable|file|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'current_image' => 'nullable|string', // For existing image handling when update
+            'gallery' => 'nullable|array',
+            'gallery.*' => 'nullable|file|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $validated['slug'] = empty($validated['slug']) ? Str::slug($validated['title']) : $validated['slug'];

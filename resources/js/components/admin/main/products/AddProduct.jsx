@@ -20,7 +20,7 @@ const AddProduct = () => {
     const [galleryPreviews, setGalleryPreviews] = useState([]);
 
     const handleImagePreview = (e, type) => {
-        if (type === 'primary') {
+        if (type === "primary") {
             const file = e.target.files[0];
             if (file) {
                 setImagePreview(URL.createObjectURL(file));
@@ -38,12 +38,16 @@ const AddProduct = () => {
 
         const formData = new FormData();
         Object.keys(data).forEach((key) => {
-            if (key === 'image') {
-                formData.append('image', data.image[0]);
-            } else if (key === 'gallery') {
-                Array.from(data.gallery).forEach((file) => {
-                    formData.append('gallery[]', file);
-                });
+            if (key === "image") {
+                if (data.image && data.image.length > 0) {
+                    formData.append("image", data.image[0]);
+                }
+            } else if (key === "gallery") {
+                if (data.gallery && data.gallery.length > 0) {
+                    Array.from(data.gallery).forEach((file) => {
+                        formData.append("gallery[]", file);
+                    });
+                }
             } else {
                 formData.append(key, data[key]);
             }
@@ -67,6 +71,8 @@ const AddProduct = () => {
             setImagePreview(null);
             setGalleryPreviews([]);
         } catch (err) {
+            console.log(err);
+
             setSuccess(false);
             setLoading(false);
 
@@ -252,7 +258,9 @@ const AddProduct = () => {
                                 type="file"
                                 accept="image/*"
                                 {...register("image")}
-                                onChange={(e) => handleImagePreview(e, 'primary')}
+                                onChange={(e) =>
+                                    handleImagePreview(e, "primary")
+                                }
                                 className="file-input file-input-ghost"
                             />
 
@@ -270,13 +278,17 @@ const AddProduct = () => {
                                 </div>
                             )}
 
-                            <label htmlFor="gallery" className="mt-12">Product Gallery</label>
+                            <label htmlFor="gallery" className="mt-12">
+                                Product Gallery
+                            </label>
                             <input
                                 type="file"
                                 multiple
                                 accept="image/*"
                                 {...register("gallery")}
-                                onChange={(e) => handleImagePreview(e, 'gallery')}
+                                onChange={(e) =>
+                                    handleImagePreview(e, "gallery")
+                                }
                                 className="file-input file-input-ghost"
                             />
 
@@ -331,4 +343,4 @@ const AddProduct = () => {
 };
 
 export default AddProduct;
-''
+("");

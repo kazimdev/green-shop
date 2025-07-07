@@ -27,7 +27,9 @@ const EditProduct = () => {
         const fetchProduct = async () => {
             setLoading(true);
             try {
-                const res = await axios.get(`http://127.0.0.1:8000/api/products/${id}`);
+                const res = await axios.get(
+                    `http://127.0.0.1:8000/api/products/${id}`
+                );
                 const product = res.data;
 
                 setValue("title", product.title);
@@ -39,9 +41,15 @@ const EditProduct = () => {
 
                 // Handle images
                 if (product.images && product.images.length > 0) {
-                    const primary = product.images.find(img => img.is_primary);
-                    setImagePreview(primary ? `/storage/${primary.image_url}` : null);
-                    const gallery = product.images.filter(img => !img.is_primary).map(img => `/storage/${img.image_url}`);
+                    const primary = product.images.find(
+                        (img) => img.is_primary
+                    );
+                    setImagePreview(
+                        primary ? `/storage/${primary.image_url}` : null
+                    );
+                    const gallery = product.images
+                        .filter((img) => !img.is_primary)
+                        .map((img) => `/storage/${img.image_url}`);
                     setInitialGallery(gallery);
                 } else {
                     setImagePreview(null);
@@ -56,7 +64,7 @@ const EditProduct = () => {
     }, [id, setValue]);
 
     const handleImagePreview = (e, type) => {
-        if (type === 'primary') {
+        if (type === "primary") {
             const file = e.target.files[0];
             if (file) {
                 setImagePreview(URL.createObjectURL(file));
@@ -72,57 +80,106 @@ const EditProduct = () => {
         setLoading(true);
         setValidationErrors({});
         const formData = new FormData();
-        let hasImage = false;
+        let hasNewImage = false;
 
-        // Only append fields if they have values
-        Object.keys(data).forEach((key) => {
-            if (key === 'image' && data.image && data.image.length > 0 && data.image[0] instanceof File) {
-                formData.append('image', data.image[0]);
-                hasImage = true;
-            } else if (key === 'gallery' && data.gallery && data.gallery.length > 0) {
-                Array.from(data.gallery).forEach((file) => {
-                    if (file instanceof File) {
-                        formData.append('gallery[]', file);
-                    }
-                });
-            } else if (data[key] !== undefined && data[key] !== null && data[key] !== "") {
-                formData.append(key, data[key]);
+        // Handle basic fields - only append if they have meaningful values
+        const basicFields = [
+            "title",
+            "description",
+            "slug",
+            "price",
+            "stock",
+            "status",
+        ];
+        
+        basicFields.forEach((field) => {
+            if (
+                data[field] !== undefined &&
+                data[field] !== null &&
+                data[field] !== ""
+            ) {
+                formData.append(field, data[field]);
             }
         });
 
-        // If user did not choose a new image, send the current image URL as a hidden field
-        if (!hasImage && imagePreview) {
-            const imagePath = imagePreview.replace(/^\/storage\//, '');
-            formData.append('current_image', imagePath);
+        // Handle primary image
+        if (
+            data.image &&
+            data.image.length > 0 &&
+            data.image[0] instanceof File
+        ) {
+            formData.append("image", data.image[0]);
+            hasNewImage = true;
         }
 
-        await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie", {
-            withCredentials: true,
-        });
+        // Handle gallery images
+        if (data.gallery && data.gallery.length > 0) {
+            const galleryFiles = Array.from(data.gallery).filter(
+                (file) => file instanceof File
+            );
+            if (galleryFiles.length > 0) {
+                galleryFiles.forEach((file) => {
+                    formData.append("gallery[]", file);
+                });
+            }
+        }
+
+        // If no new primary image is uploaded but we have an existing one, preserve it
+        if (
+            !hasNewImage &&
+            imagePreview &&
+            imagePreview.startsWith("/storage/")
+        ) {
+            const imagePath = imagePreview.replace(/^\/storage\//, "");
+            formData.append("current_image", imagePath);
+        }
+
+        // Add method spoofing for PUT request
+        formData.append("_method", "PUT");
+
+        // Get CSRF token
+        try {
+            await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie", {
+                withCredentials: true,
+            });
+        } catch (err) {
+            console.error("CSRF token fetch failed", err);
+        }
 
         try {
-            formData.append('_method', 'PUT');
-            await axios.post(`http://127.0.0.1:8000/api/products/${id}`, formData, {
-                withCredentials: true,
-                headers: {
-                    // "Content-Type": "multipart/form-data", // Let the browser set it
-                },
-            });
+            const response = await axios.post(
+                `http://127.0.0.1:8000/api/products/${id}`,
+                formData,
+                {
+                    withCredentials: true,
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+
+            console.log("Product updated successfully:", response.data);
             setSuccess(true);
-            setLoading(false);
+
+            // Optional: Navigate back to products list after successful update
+            // setTimeout(() => navigate("/dashboard/products"), 2000);
         } catch (err) {
             setSuccess(false);
-            setLoading(false);
+            console.error("Product update error:", err);
+
             if (err.response?.status === 422) {
                 const laravelErrors = err.response.data.errors;
                 setValidationErrors(laravelErrors);
-                console.error('Backend validation errors:', laravelErrors);
-                Object.entries(laravelErrors).forEach(([field, messages]) => {
-                    setValue(field, data[field]);
-                });
+                console.error("Backend validation errors:", laravelErrors);
+            } else if (err.response?.data?.message) {
+                setValidationErrors({ general: [err.response.data.message] });
             } else {
-                console.error("Product update error", err);
+                setValidationErrors({
+                    general: ["An unexpected error occurred"],
+                });
             }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -145,43 +202,53 @@ const EditProduct = () => {
                     Edit Product
                 </h2>
                 <form
-                    action=""
-                    method="post"
                     className="add-product-form p-3"
                     onSubmit={handleSubmit(onSubmit)}
-                    encType="multipart/form-data"
                 >
                     <div className="flex gap-6">
                         <fieldset className="fieldset product-info w-1/2">
                             <label htmlFor="title" className="label mb-4">
-                                <span className="text-base">Product Title:</span>
+                                <span className="text-base">
+                                    Product Title:
+                                </span>
                                 <div className="w-3/4">
                                     <input
                                         type="text"
-                                        {...register("title", { required: "Product title is required" })}
+                                        {...register("title", {
+                                            required:
+                                                "Product title is required",
+                                        })}
                                         id="title"
                                         className="input bg-base-light w-full"
                                         placeholder="My Product Title"
                                     />
                                     {errors.title && (
-                                        <p style={{ color: "red" }}>{errors.title.message}</p>
+                                        <p style={{ color: "red" }}>
+                                            {errors.title.message}
+                                        </p>
                                     )}
                                 </div>
                             </label>
+
                             <label htmlFor="description" className="label mb-4">
-                                <span className="text-base">Product Description:</span>
+                                <span className="text-base">
+                                    Product Description:
+                                </span>
                                 <div className="w-3/4">
                                     <textarea
                                         id="description"
                                         className="textarea bg-base-light w-full"
                                         placeholder="My product desc"
                                         {...register("description")}
-                                    ></textarea>
+                                    />
                                     {errors.description && (
-                                        <p style={{ color: "red" }}>{errors.description.message}</p>
+                                        <p style={{ color: "red" }}>
+                                            {errors.description.message}
+                                        </p>
                                     )}
                                 </div>
                             </label>
+
                             <label htmlFor="slug" className="label mb-4">
                                 <span className="text-base">Slug</span>
                                 <div className="w-3/4">
@@ -194,37 +261,44 @@ const EditProduct = () => {
                                     />
                                 </div>
                             </label>
+
                             <label htmlFor="price" className="label mb-4">
                                 <span className="text-base">Price ($)</span>
                                 <div className="w-3/4">
                                     <input
                                         id="price"
-                                        type="text"
-                                        placeholder="e.g, $40.00"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        placeholder="e.g, 40.00"
                                         className="input bg-base-light w-full"
                                         {...register("price")}
                                     />
                                 </div>
                             </label>
+
                             <label htmlFor="stock" className="label mb-4">
-                                <span className="text-base">Stock Quantity</span>
+                                <span className="text-base">
+                                    Stock Quantity
+                                </span>
                                 <div className="w-3/4">
                                     <input
                                         id="stock"
-                                        type="text"
+                                        type="number"
+                                        min="0"
                                         placeholder="e.g, 100"
                                         className="input bg-base-light w-full"
                                         {...register("stock")}
                                     />
                                 </div>
                             </label>
+
                             <label htmlFor="status" className="label mb-4">
                                 <span className="text-base">Status</span>
                                 <select
                                     id="status"
                                     className="select bg-base-light"
                                     {...register("status")}
-                                    defaultValue="active"
                                 >
                                     <option value="">Select</option>
                                     <option value="active">Active</option>
@@ -232,13 +306,18 @@ const EditProduct = () => {
                                 </select>
                             </label>
                         </fieldset>
+
                         <fieldset className="fieldset product-image w-1/2 p-4">
-                            <label htmlFor="image">Product Image</label>
+                            <label htmlFor="image">
+                                Product Image (Optional)
+                            </label>
                             <input
                                 type="file"
                                 accept="image/*"
                                 {...register("image")}
-                                onChange={(e) => handleImagePreview(e, 'primary')}
+                                onChange={(e) =>
+                                    handleImagePreview(e, "primary")
+                                }
                                 className="file-input file-input-ghost"
                             />
                             {imagePreview && (
@@ -246,74 +325,97 @@ const EditProduct = () => {
                                     <img
                                         src={imagePreview}
                                         alt="Preview"
-                                        style={{ width: "400px", height: "400px", objectFit: "cover" }}
+                                        style={{
+                                            width: "400px",
+                                            height: "400px",
+                                            objectFit: "cover",
+                                        }}
                                     />
                                 </div>
                             )}
-                            {(!imagePreview && initialGallery.length > 0) && (
-                                <div style={{ marginTop: "10px" }}>
-                                    <img
-                                        src={initialGallery[0]}
-                                        alt="Current"
-                                        style={{ width: "400px", height: "400px", objectFit: "cover" }}
-                                    />
-                                </div>
-                            )}
-                            <label htmlFor="gallery" className="mt-12">Product Gallery</label>
+
+                            <label htmlFor="gallery" className="mt-12">
+                                Product Gallery (Optional)
+                            </label>
                             <input
                                 type="file"
                                 multiple
                                 accept="image/*"
                                 {...register("gallery")}
-                                onChange={(e) => handleImagePreview(e, 'gallery')}
+                                onChange={(e) =>
+                                    handleImagePreview(e, "gallery")
+                                }
                                 className="file-input file-input-ghost"
                             />
-                            {(galleryPreviews.length > 0 || initialGallery.length > 1) && (
-                                <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+                            {(galleryPreviews.length > 0 ||
+                                initialGallery.length > 0) && (
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        gap: "10px",
+                                        marginTop: "10px",
+                                        flexWrap: "wrap",
+                                    }}
+                                >
                                     {galleryPreviews.length > 0
                                         ? galleryPreviews.map((src, i) => (
-                                            <img
-                                                key={i}
-                                                src={src}
-                                                alt="Preview"
-                                                style={{ width: "120px", height: "120px", objectFit: "cover" }}
-                                            />
-                                        ))
-                                        : initialGallery.slice(1).map((src, i) => (
-                                            <img
-                                                key={i}
-                                                src={src}
-                                                alt="Current"
-                                                style={{ width: "120px", height: "120px", objectFit: "cover" }}
-                                            />
-                                        ))}
+                                              <img
+                                                  key={`preview-${i}`}
+                                                  src={src}
+                                                  alt="Preview"
+                                                  style={{
+                                                      width: "120px",
+                                                      height: "120px",
+                                                      objectFit: "cover",
+                                                  }}
+                                              />
+                                          ))
+                                        : initialGallery.map((src, i) => (
+                                              <img
+                                                  key={`current-${i}`}
+                                                  src={src}
+                                                  alt="Current"
+                                                  style={{
+                                                      width: "120px",
+                                                      height: "120px",
+                                                      objectFit: "cover",
+                                                  }}
+                                              />
+                                          ))}
                                 </div>
                             )}
                         </fieldset>
                     </div>
+
                     {Object.keys(validationErrors).length > 0 && (
                         <div className="mb-4">
-                            {Object.entries(validationErrors).map(([field, messages]) => (
-                                <p key={field} style={{ color: 'red' }}>
-                                    {messages.join(' ')}
-                                </p>
-                            ))}
+                            {Object.entries(validationErrors).map(
+                                ([field, messages]) => (
+                                    <p key={field} style={{ color: "red" }}>
+                                        <strong>{field}:</strong>{" "}
+                                        {Array.isArray(messages)
+                                            ? messages.join(" ")
+                                            : messages}
+                                    </p>
+                                )
+                            )}
                         </div>
                     )}
+
                     <input
                         type="submit"
                         className="text-white btn btn-soft btn-info my-4 max-w-48"
-                        value="Update Product"
+                        value={loading ? "Updating..." : "Update Product"}
+                        disabled={loading}
                     />
                 </form>
+
                 {loading && <Loader />}
-                {success ? (
+                {success && (
                     <Alert
-                        type={success ? "success" : "error"}
-                        message={success ? "Product updated successfully!" : "Failed to update product."}
+                        type="success"
+                        message="Product updated successfully!"
                     />
-                ) : (
-                    ""
                 )}
             </div>
         </>
