@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -141,6 +142,16 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $product = Product::findOrFail($id);
+
+        // Delete all related images and their files
+        foreach ($product->images as $image) {
+            Storage::disk('public')->delete($image->image_url);
+            $image->delete();
+        }
+
+        $product->delete();
+
+        return response()->json(['message' => 'Product deleted successfully.']);
     }
 }

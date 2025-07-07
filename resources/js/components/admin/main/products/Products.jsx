@@ -38,6 +38,24 @@ const Products = () => {
             : null;
     };
 
+    const handleDelete = async (e, id) => {
+        e.preventDefault();
+        if (!window.confirm("Are you sure you want to delete this product?")) {
+            return;
+        }
+        setLoading(true);
+        try {
+            await axios.delete(`http://127.0.0.1:8000/api/products/${id}`, {
+                withCredentials: true,
+            });
+            setProducts((prev) => prev.filter((product) => product.id !== id));
+        } catch (error) {
+            console.error("Failed to delete product:", error);
+            alert("Failed to delete product.");
+        }
+        setLoading(false);
+    };
+
     return (
         <>
             <div className="products-header mb-4">
@@ -132,7 +150,12 @@ const Products = () => {
                                                 />
                                             </button>
 
-                                            <button className="delete">
+                                            <button
+                                                onClick={(e) =>
+                                                    handleDelete(e, product.id)
+                                                }
+                                                className="delete"
+                                            >
                                                 <img
                                                     src="/icons/delete.svg"
                                                     alt="Delete"
