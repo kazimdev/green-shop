@@ -52,6 +52,18 @@ table form {
     background: #243a48;
     border-radius: 3px;
 }
+.categories form {
+    width: 25%;
+}
+.category-list {
+    width: 75%;
+}
+li.parent-cat {
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    background: #f0f0f0;
+}
 .products-list table thead th,
 .products-list table tbody td {
     padding: 15px;

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import axios from "../../../auth/axios";
 import Alert from "../../../ui/Alert";
 import Loader from "../../../ui/Loader";
+import useCategoryTree from "../../../hooks/useCategoryTree";
 
 const AddProduct = () => {
     const {
@@ -18,6 +19,9 @@ const AddProduct = () => {
     const [loading, setLoading] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
     const [galleryPreviews, setGalleryPreviews] = useState([]);
+    const [selectedCategories, setSelectedCategories] = useState([]);
+
+    const { categoryTree, loadingCategories } = useCategoryTree();
 
     const handleImagePreview = (e, type) => {
         if (type === "primary") {
@@ -32,7 +36,37 @@ const AddProduct = () => {
         }
     };
 
-    // Submit handler
+    const handleCategoryChange = (id) => {
+        setSelectedCategories((prev) =>
+            prev.includes(id)
+                ? prev.filter((catId) => catId !== id)
+                : [...prev, id]
+        );
+    };
+
+    const renderCategoryCheckboxes = (tree, level = 0) =>
+        tree.map((cat) => (
+            <div
+                key={cat.id}
+                style={{ marginLeft: level * 16 }}
+                className="mb-1 flex items-center"
+            >
+                <input
+                    type="checkbox"
+                    value={cat.id}
+                    checked={selectedCategories.includes(cat.id)}
+                    onChange={() => handleCategoryChange(cat.id)}
+                    className="checkbox checkbox-accent"
+                />
+                <span className="ml-2">{cat.name}</span>
+                {cat.children && cat.children.length > 0 && (
+                    <div className="w-full">
+                        {renderCategoryCheckboxes(cat.children, level + 1)}
+                    </div>
+                )}
+            </div>
+        ));
+
     const onSubmit = async (data) => {
         setLoading(true);
 
@@ -46,6 +80,10 @@ const AddProduct = () => {
                 if (data.gallery && data.gallery.length > 0) {
                     Array.from(data.gallery).forEach((file) => {
                         formData.append("gallery[]", file);
+                    });
+                } else if (data.categories && Array.isArray(data.categories)) {
+                    data.categories.forEach((catId) => {
+                        formData.append("categories[]", catId);
                     });
                 }
             } else {
@@ -110,7 +148,9 @@ const AddProduct = () => {
                     action=""
                     method="post"
                     className="add-product-form p-3"
-                    onSubmit={handleSubmit(onSubmit)}
+                    onSubmit={handleSubmit((data) =>
+                        onSubmit({ ...data, categories: selectedCategories })
+                    )}
                     encType="multipart/form-data"
                 >
                     <div className="flex gap-6">
@@ -209,31 +249,15 @@ const AddProduct = () => {
                             />
                         </label> */}
 
-                            <div className="product-categories flex gap-10 mb-4">
-                                <span className="text-base">
+                            <div className="product-categories flex flex-col gap-2 mb-4">
+                                <span className="text-base font-semibold mb-1">
                                     Product Categories
                                 </span>
-
-                                <div className="labels">
-                                    <label className="block mb-2">
-                                        <input
-                                            type="checkbox"
-                                            value="electronics"
-                                            className="checkbox checkbox-accent"
-                                        />
-                                        <span className="ml-2">
-                                            Electronics
-                                        </span>
-                                    </label>
-                                    <label className="block mb-2">
-                                        <input
-                                            type="checkbox"
-                                            value="clothing"
-                                            className="checkbox checkbox-accent"
-                                        />
-                                        <span className="ml-2">Clothing</span>
-                                    </label>
-                                </div>
+                                {loadingCategories ? (
+                                    <span>Loading categories...</span>
+                                ) : (
+                                    renderCategoryCheckboxes(categoryTree)
+                                )}
                             </div>
 
                             <label htmlFor="status" className="label mb-4">
@@ -343,4 +367,3 @@ const AddProduct = () => {
 };
 
 export default AddProduct;
-("");
