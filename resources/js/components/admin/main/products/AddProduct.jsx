@@ -45,27 +45,31 @@ const AddProduct = () => {
     };
 
     const renderCategoryCheckboxes = (tree, level = 0) =>
-        tree.map((cat) => (
-            <div
-                key={cat.id}
-                style={{ marginLeft: level * 16 }}
-                className="mb-1 flex items-center"
-            >
-                <input
-                    type="checkbox"
-                    value={cat.id}
-                    checked={selectedCategories.includes(cat.id)}
-                    onChange={() => handleCategoryChange(cat.id)}
-                    className="checkbox checkbox-accent"
-                />
-                <span className="ml-2">{cat.name}</span>
-                {cat.children && cat.children.length > 0 && (
-                    <div className="w-full">
-                        {renderCategoryCheckboxes(cat.children, level + 1)}
-                    </div>
-                )}
-            </div>
-        ));
+        tree.map((cat) => {
+            const categoryName = "category[" + cat.id + "]";
+
+            return (
+                <div key={cat.id} className="mb-1 ml-6">
+                    <input
+                        type="checkbox"
+                        value={cat.id}
+                        id={categoryName}
+                        {...register(categoryName)}
+                        checked={selectedCategories.includes(cat.id)}
+                        onChange={() => handleCategoryChange(cat.id)}
+                        className="checkbox checkbox-accent"
+                    />
+                    <label htmlFor={categoryName} className="ml-1 text-base">
+                        {cat.name}
+                    </label>
+                    {cat.children && cat.children.length > 0 && (
+                        <div className="sub-cat">
+                            {renderCategoryCheckboxes(cat.children, level + 1)}
+                        </div>
+                    )}
+                </div>
+            );
+        });
 
     const onSubmit = async (data) => {
         setLoading(true);
@@ -249,10 +253,10 @@ const AddProduct = () => {
                             />
                         </label> */}
 
-                            <div className="product-categories flex flex-col gap-2 mb-4">
-                                <span className="text-base font-semibold mb-1">
-                                    Product Categories
-                                </span>
+                            <h3 className="text-base font-semibold mb-1">
+                                Product Categories
+                            </h3>
+                            <div className="product-categories flex flex-col gap-2 mb-4 max-h-[300px] overflow-y-auto">
                                 {loadingCategories ? (
                                     <span>Loading categories...</span>
                                 ) : (

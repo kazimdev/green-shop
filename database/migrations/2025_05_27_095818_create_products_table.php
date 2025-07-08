@@ -11,7 +11,8 @@ class CreateProductsTable extends Migration
      *
      * @return void
      */
-     public function up() {
+    public function up()
+    {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('title'); // required
@@ -20,9 +21,9 @@ class CreateProductsTable extends Migration
             $table->decimal('price', 10, 2)->nullable();
             $table->integer('stock')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->foreignId('category_id')->nullable()->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
+        // Remove pivot table creation from here, handled in its own migration
     }
 
     /**

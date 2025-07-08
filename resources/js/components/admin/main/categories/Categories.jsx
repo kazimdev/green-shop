@@ -77,6 +77,20 @@ const Categories = () => {
         ));
     };
 
+    const renderOptions = (cat, prefix = "") => {
+        const option = [
+            <option key={cat.id} value={cat.id}>
+                {prefix + cat.name}
+            </option>
+        ];
+        if (cat.children && cat.children.length > 0) {
+            cat.children.forEach(child => {
+                option.push(...renderOptions(child, prefix + "- "));
+            });
+        }
+        return option;
+    };
+
     return (
         <div className="categories flex gap-x-24">
             <form onSubmit={handleSubmit}>
@@ -108,19 +122,7 @@ const Categories = () => {
                     >
                         <option value="">None</option>
                         {/* Use flat list for parent selection */}
-                        {categoryTree.flatMap(function renderOptions(cat, prefix = "") {
-                            const option = [
-                                <option key={cat.id} value={cat.id}>
-                                    {prefix + cat.name}
-                                </option>
-                            ];
-                            if (cat.children && cat.children.length > 0) {
-                                cat.children.forEach(child => {
-                                    option.push(...renderOptions(child, prefix + "— "));
-                                });
-                            }
-                            return option;
-                        })}
+                        {categoryTree.map(cat => renderOptions(cat))}
                     </select>
                 </label>
 

@@ -32,7 +32,8 @@ class ProductController extends Controller
             'price' => 'nullable|numeric|min:0',
             'stock' => 'nullable|integer|min:0',
             'status' => 'nullable|in:active,inactive',
-            'category_id' => 'nullable|exists:categories,id',
+            'categories' => 'nullable|array',
+            'categories.*' => 'exists:categories,id',
             'image' => 'nullable|file|image|mimes:jpg,jpeg,png|max:2048',
             'gallery' => 'nullable|array',
             'gallery.*' => 'file|image|mimes:jpg,jpeg,png|max:2048',
@@ -40,7 +41,16 @@ class ProductController extends Controller
 
         $validated['slug'] = empty($validated['slug']) ? Str::slug($validated['title']) : $validated['slug'];
 
+        // Remove categories from $validated for mass assignment
+        $categoryIds = $validated['categories'] ?? [];
+        unset($validated['categories']);
+
         $product = Product::create($validated);
+
+        // Attach categories (many-to-many)
+        if (!empty($categoryIds)) {
+            $product->categories()->sync($categoryIds);
+        }
 
         // Save primary image (optional)
         if ($request->hasFile('image')) {

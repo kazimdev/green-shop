@@ -58,6 +58,12 @@ table form {
 .category-list {
     width: 75%;
 }
+.checkbox.checkbox-accent {
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    margin-bottom: 6px;
+}
 li.parent-cat {
     padding: 10px;
     margin-bottom: 10px;
