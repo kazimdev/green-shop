@@ -15,7 +15,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with('images')->get();
+        $products = Product::with(['images', 'categories'])->get();
 
         return response()->json($products);
     }
@@ -80,7 +80,7 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        $product = Product::with('images')->findOrFail($id);
+        $product = Product::with(['images', 'categories'])->findOrFail($id);
 
         return response()->json($product);
     }
@@ -99,7 +99,8 @@ class ProductController extends Controller
             'price' => 'nullable|numeric|min:0',
             'stock' => 'nullable|integer|min:0',
             'status' => 'nullable|in:active,inactive',
-            'category_id' => 'nullable|exists:categories,id',
+            'categories' => 'nullable|array',
+            'categories.*' => 'exists:categories,id',
             'image' => 'nullable|file|image|mimes:jpg,jpeg,png,webp|max:2048',
             'current_image' => 'nullable|string', // For existing image handling when update
             'gallery' => 'nullable|array',
@@ -108,7 +109,14 @@ class ProductController extends Controller
 
         $validated['slug'] = empty($validated['slug']) ? Str::slug($validated['title']) : $validated['slug'];
 
+        // Remove categories from $validated for mass assignment
+        $categoryIds = $validated['categories'] ?? [];
+        unset($validated['categories']);
+
         $product->update($validated);
+
+        // Sync categories (many-to-many in the pivot table)
+        $product->categories()->sync($categoryIds);
 
         // Handle primary image update
         if ($request->hasFile('image')) {
@@ -144,7 +152,7 @@ class ProductController extends Controller
             }
         }
 
-        return response()->json($product->load('images'));
+        return response()->json($product->load(['images', 'categories']));
     }
 
     /**

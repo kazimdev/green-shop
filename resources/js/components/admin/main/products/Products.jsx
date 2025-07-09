@@ -82,9 +82,9 @@ const Products = () => {
                             <th>ID</th>
                             <th>Image</th>
                             <th>Product</th>
-                            <th>Type</th>
                             <th>Price</th>
                             <th>Stock</th>
+                            <th>Categories</th>
                             <th>Status</th>
                             <th className="actions text-right">Actions</th>
                         </tr>
@@ -98,6 +98,7 @@ const Products = () => {
                             </tr>
                         ) : (
                             products.map((product) => {
+                                
                                 const imageUrl = getPrimaryImageUrl(
                                     product.images || []
                                 );
@@ -116,7 +117,6 @@ const Products = () => {
                                             />
                                         </td>
                                         <td>{product.title}</td>
-                                        <td>{product.type}</td>
                                         <td>
                                             {product?.price
                                                 ? "$" +
@@ -126,6 +126,15 @@ const Products = () => {
                                                 : "N/A"}
                                         </td>
                                         <td>{product.stock}</td>
+                                        <td>
+                                            {Array.isArray(
+                                                product.categories
+                                            ) && product.categories.length > 0
+                                                ? product.categories
+                                                      .map((cat) => cat.name)
+                                                      .join(", ")
+                                                : "-"}
+                                        </td>
                                         <td>{product.status}</td>
                                         <td className="actions text-right">
                                             <Link

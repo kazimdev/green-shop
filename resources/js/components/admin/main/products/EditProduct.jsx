@@ -4,6 +4,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "../../../auth/axios";
 import Alert from "../../../ui/Alert";
 import Loader from "../../../ui/Loader";
+import useCategoryTree from "../../../hooks/useCategoryTree";
 
 const EditProduct = () => {
     const { id } = useParams();
@@ -16,12 +17,15 @@ const EditProduct = () => {
         formState: { errors },
     } = useForm();
 
+    const { categoryTree, loadingCategories } = useCategoryTree();
+
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
     const [galleryPreviews, setGalleryPreviews] = useState([]);
     const [initialGallery, setInitialGallery] = useState([]);
     const [validationErrors, setValidationErrors] = useState({});
+    const [selectedCategories, setSelectedCategories] = useState([]);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -31,6 +35,9 @@ const EditProduct = () => {
                     `http://127.0.0.1:8000/api/products/${id}`
                 );
                 const product = res.data;
+
+                console.log(product);
+
 
                 setValue("title", product.title);
                 setValue("description", product.description);
@@ -55,6 +62,13 @@ const EditProduct = () => {
                     setImagePreview(null);
                     setInitialGallery([]);
                 }
+
+                // Set selected categories from product.categories (array of category objects or ids)
+                if (product.categories) {
+                    setSelectedCategories(
+                        product.categories.map((cat) => (cat.id ? cat.id : cat))
+                    );
+                }
             } catch (err) {
                 console.error("Failed to fetch product", err);
             }
@@ -76,6 +90,39 @@ const EditProduct = () => {
         }
     };
 
+    const handleCategoryChange = (id) => {
+        setSelectedCategories((prev) =>
+            prev.includes(id)
+                ? prev.filter((catId) => catId !== id)
+                : [...prev, id]
+        );
+    };
+
+    const renderCategoryCheckboxes = (tree, level = 0) =>
+        tree.map((cat) => {
+            const categoryName = `categories[${cat.id}]`;
+            return (
+                <div key={cat.id} className="mb-1 ml-6">
+                    <input
+                        type="checkbox"
+                        value={cat.id}
+                        id={categoryName}
+                        checked={selectedCategories.includes(cat.id)}
+                        onChange={() => handleCategoryChange(cat.id)}
+                        className="checkbox checkbox-accent"
+                    />
+                    <label htmlFor={categoryName} className="ml-1 text-base">
+                        {cat.name}
+                    </label>
+                    {cat.children && cat.children.length > 0 && (
+                        <div className="sub-cat">
+                            {renderCategoryCheckboxes(cat.children, level + 1)}
+                        </div>
+                    )}
+                </div>
+            );
+        });
+
     const onSubmit = async (data) => {
         setLoading(true);
         setValidationErrors({});
@@ -91,7 +138,7 @@ const EditProduct = () => {
             "stock",
             "status",
         ];
-        
+
         basicFields.forEach((field) => {
             if (
                 data[field] !== undefined &&
@@ -133,6 +180,11 @@ const EditProduct = () => {
             const imagePath = imagePreview.replace(/^\/storage\//, "");
             formData.append("current_image", imagePath);
         }
+
+        // Always append selectedCategories as categories[]
+        selectedCategories.forEach((catId) => {
+            formData.append("categories[]", catId);
+        });
 
         // Add method spoofing for PUT request
         formData.append("_method", "PUT");
@@ -305,6 +357,17 @@ const EditProduct = () => {
                                     <option value="inactive">Inactive</option>
                                 </select>
                             </label>
+
+                            <h3 className="text-base font-semibold mb-1">
+                                Product Categories
+                            </h3>
+                            <div className="product-categories flex flex-col gap-2 mb-4 max-h-[300px] overflow-y-auto">
+                                {loadingCategories ? (
+                                    <span>Loading categories...</span>
+                                ) : (
+                                    renderCategoryCheckboxes(categoryTree)
+                                )}
+                            </div>
                         </fieldset>
 
                         <fieldset className="fieldset product-image w-1/2 p-4">

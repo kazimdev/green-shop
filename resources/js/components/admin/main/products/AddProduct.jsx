@@ -46,7 +46,7 @@ const AddProduct = () => {
 
     const renderCategoryCheckboxes = (tree, level = 0) =>
         tree.map((cat) => {
-            const categoryName = "category[" + cat.id + "]";
+            const categoryName = "categories[" + cat.id + "]";
 
             return (
                 <div key={cat.id} className="mb-1 ml-6">
@@ -85,15 +85,17 @@ const AddProduct = () => {
                     Array.from(data.gallery).forEach((file) => {
                         formData.append("gallery[]", file);
                     });
-                } else if (data.categories && Array.isArray(data.categories)) {
-                    data.categories.forEach((catId) => {
-                        formData.append("categories[]", catId);
-                    });
                 }
-            } else {
+            } else if (key !== "categories") {
                 formData.append(key, data[key]);
             }
         });
+        // Always append selectedCategories as categories[]
+        selectedCategories.forEach((catId) => {
+            formData.append("categories[]", catId);
+        });
+
+        console.log(formData);
 
         await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie", {
             withCredentials: true,
