@@ -90,6 +90,7 @@ const AddProduct = () => {
                 formData.append(key, data[key]);
             }
         });
+        
         // Always append selectedCategories as categories[]
         selectedCategories.forEach((catId) => {
             formData.append("categories[]", catId);

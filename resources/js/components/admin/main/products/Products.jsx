@@ -58,7 +58,7 @@ const Products = () => {
 
     return (
         <>
-            <div className="products-header mb-4">
+            <div className="content-header mb-4">
                 <h2 className="inline-flex items-center gap-3 text-2xl font-bold mr-3">
                     Products
                 </h2>
@@ -71,7 +71,7 @@ const Products = () => {
                 </Link>
             </div>
 
-            <div className="products-filters bg-white px-4 py-3 shadow-sm mb-4 rounded-sm">
+            <div className="content-filters bg-white px-4 py-3 shadow-sm mb-4 rounded-sm">
                 Product Filters
             </div>
 
@@ -98,7 +98,6 @@ const Products = () => {
                             </tr>
                         ) : (
                             products.map((product) => {
-                                
                                 const imageUrl = getPrimaryImageUrl(
                                     product.images || []
                                 );

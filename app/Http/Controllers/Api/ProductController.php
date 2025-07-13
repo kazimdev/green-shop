@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -81,6 +82,8 @@ class ProductController extends Controller
     public function show(string $id)
     {
         $product = Product::with(['images', 'categories'])->findOrFail($id);
+
+        // Log::info(json_encode($product, JSON_PRETTY_PRINT));
 
         return response()->json($product);
     }

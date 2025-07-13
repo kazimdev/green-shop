@@ -25,7 +25,7 @@ const Sidebar = () => {
         "/dashboard/categories": "Categories",
         "/dashboard/orders": "Orders",
         "/dashboard/customers": "Customers",
-        "/dashboard/staffs": "Our staffs",
+        "/dashboard/users": "Our staffs",
         "/dashboard/settings": "Settings",
     };
 

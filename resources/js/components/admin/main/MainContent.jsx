@@ -1,9 +1,10 @@
 import { Route, Routes } from "react-router-dom";
-import Categories from "./categories/Categories";
+import Users from "./users/Users";
 import Dashboard from "./Dashboard";
-import AddProduct from "./products/AddProduct";
 import Products from "./products/Products";
+import AddProduct from "./products/AddProduct";
 import EditProduct from "./products/EditProduct";
+import Categories from "./categories/Categories";
 import useAuthRedirect from "../../hooks/useAuthRedirect";
 
 const MainContent = () => {
@@ -29,6 +30,8 @@ const MainContent = () => {
                     path="/dashboard/categories"
                     element={<Categories></Categories>}
                 />
+
+                <Route path="/dashboard/users" element={<Users></Users>}></Route>
             </Routes>
         </div>
     );
