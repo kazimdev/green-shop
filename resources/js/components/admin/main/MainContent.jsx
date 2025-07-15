@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
-import Users from "./users/Users";
 import Dashboard from "./Dashboard";
+import Users from "./users/Users";
+import AddUser from "./users/AddUser";
 import Products from "./products/Products";
 import AddProduct from "./products/AddProduct";
 import EditProduct from "./products/EditProduct";
@@ -11,7 +12,7 @@ const MainContent = () => {
     useAuthRedirect();
 
     return (
-        <div className="main-content w-5/6 p-4 text-primary">
+        <div className="main-content p-4 text-primary w-5/6">
             <Routes>
                 <Route path="/dashboard" element={<Dashboard></Dashboard>} />
                 <Route
@@ -31,7 +32,15 @@ const MainContent = () => {
                     element={<Categories></Categories>}
                 />
 
-                <Route path="/dashboard/users" element={<Users></Users>}></Route>
+                {/* Users */}
+                <Route
+                    path="/dashboard/users"
+                    element={<Users></Users>}
+                ></Route>
+                <Route
+                    path="/dashboard/users/add"
+                    element={<AddUser></AddUser>}
+                ></Route>
             </Routes>
         </div>
     );

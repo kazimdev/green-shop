@@ -31,14 +31,14 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
             'role' => 'nullable|string',
+            'password' => 'required|min:6',
         ]);
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
             'role' => $validated['role'] ?? 'User',
+            'password' => Hash::make($validated['password']),
         ]);
         return response()->json($user, 201);
     }
@@ -47,10 +47,13 @@ class UserController extends Controller
     public function destroy($id)
     {
         $user = User::find($id);
+
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
+
         $user->delete();
+
         return response()->json(['message' => 'User deleted successfully']);
     }
 }

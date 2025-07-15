@@ -72,9 +72,8 @@ li.parent-cat {
 }
 .products-list table thead th,
 .products-list table tbody td {
-    padding: 15px;
+    padding: 10px 15px;
 }
-
 .products-list table tbody tr:nth-child(n) {
     background: #f4f4f4;
 }

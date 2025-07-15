@@ -68,8 +68,8 @@ const Users = () => {
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
-                            <th>Role</th>
                             <th>Phone</th>
+                            <th>Role</th>
                             <th className="actions text-right">Actions</th>
                         </tr>
                     </thead>
@@ -83,11 +83,20 @@ const Users = () => {
                         ) : (
                             users.map((user) => {
                                 return (
-                                    <tr>
+                                    <tr key={user.id}>
                                         <td>{user.name}</td>
                                         <td>{user.email}</td>
-                                        <td>{user.role}</td>
                                         <td>{user.phone}</td>
+                                        <td>
+                                            {user.role
+                                                ? user.role
+                                                      .replace(/_/g, " ")
+                                                      .replace(
+                                                          /\b\w/g,
+                                                          (c) => c.toUpperCase()
+                                                      )
+                                                : ""}
+                                        </td>
 
                                         <td className="actions text-right">
                                             <Link

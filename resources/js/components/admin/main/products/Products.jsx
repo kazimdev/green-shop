@@ -71,12 +71,12 @@ const Products = () => {
                 </Link>
             </div>
 
-            <div className="content-filters bg-white px-4 py-3 shadow-sm mb-4 rounded-sm">
+            <div className="content-filters bg-white px-4 py-2 shadow-sm mb-4 rounded-sm">
                 Product Filters
             </div>
 
-            <div className="products-list  bg-white px-4 py-3 shadow-sm mb-4 rounded-sm">
-                <table className="table-auto w-full text-left">
+            <div className="products-list  bg-white px-4 py-2 shadow-sm mb-4 rounded-sm">
+                <table className="table-auto w-full text-left ">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -89,95 +89,106 @@ const Products = () => {
                             <th className="actions text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {loading ? (
-                            <tr>
-                                <td colSpan="8" className="text-center">
-                                    <Loader />
-                                </td>
-                            </tr>
-                        ) : (
-                            products.map((product) => {
-                                const imageUrl = getPrimaryImageUrl(
-                                    product.images || []
-                                );
-
-                                return (
-                                    <tr key={product.id}>
-                                        <td>#{product.id}</td>
-                                        <td>
-                                            <img
-                                                src={
-                                                    imageUrl ||
-                                                    "/images/no-image.webp"
-                                                }
-                                                alt={product.title}
-                                                className="w-8 h-8 object-cover"
-                                            />
-                                        </td>
-                                        <td>{product.title}</td>
-                                        <td>
-                                            {product?.price
-                                                ? "$" +
-                                                  parseFloat(
-                                                      product.price
-                                                  ).toFixed(2)
-                                                : "N/A"}
-                                        </td>
-                                        <td>{product.stock}</td>
-                                        <td>
-                                            {Array.isArray(
-                                                product.categories
-                                            ) && product.categories.length > 0
-                                                ? product.categories
-                                                      .map((cat) => cat.name)
-                                                      .join(", ")
-                                                : "-"}
-                                        </td>
-                                        <td>{product.status}</td>
-                                        <td className="actions text-right">
-                                            <Link
-                                                to={`/dashboard/products/edit/${product.id}`}
-                                                className="edit mr-3"
-                                            >
-                                                <img
-                                                    src="/icons/edit.svg"
-                                                    alt="Edit"
-                                                    width={16}
-                                                    height={16}
-                                                />
-                                            </Link>
-
-                                            <button className="preview mr-3">
-                                                {" "}
-                                                <img
-                                                    src="/icons/preview.svg"
-                                                    alt="Preview"
-                                                    width={16}
-                                                    height={16}
-                                                />
-                                            </button>
-
-                                            <button
-                                                onClick={(e) =>
-                                                    handleDelete(e, product.id)
-                                                }
-                                                className="delete"
-                                            >
-                                                <img
-                                                    src="/icons/delete.svg"
-                                                    alt="Delete"
-                                                    width={16}
-                                                    height={16}
-                                                />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                );
-                            })
-                        )}
-                    </tbody>
                 </table>
+
+                <div className="max-h-[76vh] overflow-hidden overflow-y-auto">
+                    <table className="table-auto w-full text-left">
+                        <tbody>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="8" className="text-center">
+                                        <Loader />
+                                    </td>
+                                </tr>
+                            ) : (
+                                products.map((product) => {
+                                    const imageUrl = getPrimaryImageUrl(
+                                        product.images || []
+                                    );
+
+                                    return (
+                                        <tr key={product.id}>
+                                            <td>#{product.id}</td>
+                                            <td>
+                                                <img
+                                                    src={
+                                                        imageUrl ||
+                                                        "/images/no-image.webp"
+                                                    }
+                                                    alt={product.title}
+                                                    className="w-8 h-8 object-cover"
+                                                />
+                                            </td>
+                                            <td>{product.title}</td>
+                                            <td>
+                                                {product?.price
+                                                    ? "$" +
+                                                      parseFloat(
+                                                          product.price
+                                                      ).toFixed(2)
+                                                    : "N/A"}
+                                            </td>
+                                            <td>{product.stock}</td>
+                                            <td>
+                                                {Array.isArray(
+                                                    product.categories
+                                                ) &&
+                                                product.categories.length > 0
+                                                    ? product.categories
+                                                          .map(
+                                                              (cat) => cat.name
+                                                          )
+                                                          .join(", ")
+                                                    : "-"}
+                                            </td>
+                                            <td>{product.status}</td>
+                                            <td className="actions text-right">
+                                                <Link
+                                                    to={`/dashboard/products/edit/${product.id}`}
+                                                    className="edit mr-3"
+                                                >
+                                                    <img
+                                                        src="/icons/edit.svg"
+                                                        alt="Edit"
+                                                        width={16}
+                                                        height={16}
+                                                    />
+                                                </Link>
+
+                                                <button className="preview mr-3">
+                                                    {" "}
+                                                    <img
+                                                        src="/icons/preview.svg"
+                                                        alt="Preview"
+                                                        width={16}
+                                                        height={16}
+                                                    />
+                                                </button>
+
+                                                <button
+                                                    onClick={(e) =>
+                                                        handleDelete(
+                                                            e,
+                                                            product.id
+                                                        )
+                                                    }
+                                                    className="delete"
+                                                >
+                                                    <img
+                                                        src="/icons/delete.svg"
+                                                        alt="Delete"
+                                                        width={16}
+                                                        height={16}
+                                                    />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </>
     );
