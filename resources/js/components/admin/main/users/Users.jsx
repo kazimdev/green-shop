@@ -31,6 +31,26 @@ const Users = () => {
         fetchUsers();
     }, []);
 
+    const handleDelete = async (e, id) => {
+        e.preventDefault();
+        if (!window.confirm("Are you sure you want to delete this user?")) {
+            return;
+        }
+        setLoading(true);
+        try {
+            await axios.delete(`http://127.0.0.1:8000/api/users/${id}`, {
+                withCredentials: true,
+            });
+            setUsers((prev) => prev.filter((user) => user.id !== id));
+        } catch (error) {
+            console.error("Failed to delete user:", error);
+            alert("Failed to delete user.");
+        }
+        setLoading(false);
+    };
+
+    console.log(users);
+
     const contentHeader = (
         <div className="content-header mb-4">
             <h2 className="inline-flex items-center gap-3 text-2xl font-bold mr-3">
@@ -91,9 +111,8 @@ const Users = () => {
                                             {user.role
                                                 ? user.role
                                                       .replace(/_/g, " ")
-                                                      .replace(
-                                                          /\b\w/g,
-                                                          (c) => c.toUpperCase()
+                                                      .replace(/\b\w/g, (c) =>
+                                                          c.toUpperCase()
                                                       )
                                                 : ""}
                                         </td>

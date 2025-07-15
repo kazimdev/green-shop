@@ -1,5 +1,7 @@
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import LogoutButton from "../../auth/LogoutButton";
+import axios from "../../auth/axios";
 
 const Sidebar = () => {
     const location = useLocation();
@@ -9,8 +11,9 @@ const Sidebar = () => {
     const inactiveClasses = "flex gap-2 items-center p-3 mb-2";
 
     // check if the current path includes the given path
-
-    const isActive = (path) => activePath === path || (path != "/dashboard" && activePath.startsWith(path));
+    const isActive = (path) =>
+        activePath === path ||
+        (path != "/dashboard" && activePath.startsWith(path));
 
     const pointer = (
         <div className="inline-grid *:[grid-area:1/1]">
@@ -19,13 +22,26 @@ const Sidebar = () => {
         </div>
     );
 
+    const [user, setUser] = React.useState(null);
+
+    React.useEffect(() => {
+        axios
+            .get("/api/user")
+            .then((res) => setUser(res.data))
+            .catch(() => setUser(null));
+    }, []);
+    
+    const isAdmin = user && (user.role === "admin" || user.role === "Admin");
+
     const routes = {
         "/dashboard": "Dashboard",
-        "/dashboard/products": "Products",
-        "/dashboard/categories": "Categories",
-        "/dashboard/orders": "Orders",
-        "/dashboard/customers": "Customers",
-        "/dashboard/users": "Our staffs",
+        ...(isAdmin && {
+            "/dashboard/products": "Products",
+            "/dashboard/categories": "Categories",
+            "/dashboard/orders": "Orders",
+            "/dashboard/customers": "Customers",
+            "/dashboard/users": "Our staffs",
+        }),
         "/dashboard/settings": "Settings",
     };
 

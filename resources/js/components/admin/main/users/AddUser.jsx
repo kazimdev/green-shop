@@ -20,6 +20,7 @@ const AddUser = () => {
         { value: "editor", label: "Editor" },
         { value: "shop_manager", label: "Shop Manager" },
         { value: "seo_manager", label: "SEO Manager" },
+        { value: "customer", label: "Customer" },
         { value: "subscriber", label: "Subscriber" },
         { value: "user", label: "User" },
     ];
