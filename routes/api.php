@@ -18,13 +18,13 @@ use App\Http\Controllers\Api\CategoryController;
 |
 */
 
-// Use only Sanctum for API authentication and user info
+// Use only Sanctum for API authentication checks and getting the logged-in user info
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
 
-// Admin Routes
+// Admin CRUD Routes
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::apiResource('users', UserController::class);
     Route::apiResource('products', ProductController::class);
