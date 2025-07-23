@@ -12,9 +12,11 @@ const AddUser = () => {
         reset,
         formState: { errors },
     } = useForm();
+
     const [loading, setLoading] = React.useState(false);
     const [success, setSuccess] = React.useState(false);
     const [validationErrors, setValidationErrors] = React.useState({});
+
     const roleOptions = [
         { value: "admin", label: "Admin" },
         { value: "editor", label: "Editor" },

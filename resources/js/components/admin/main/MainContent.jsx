@@ -9,12 +9,13 @@ import EditProduct from "./products/EditProduct";
 import Categories from "./categories/Categories";
 import useAuthRedirect from "../../hooks/useAuthRedirect";
 import axios from "../../auth/axios";
+import EditUser from "./users/EditUser";
 
 const MainContent = () => {
     useAuthRedirect();
 
     const [user, setUser] = React.useState(null);
-    
+
     React.useEffect(() => {
         axios
             .get("/api/user")
@@ -53,13 +54,14 @@ const MainContent = () => {
                             path="/dashboard/users/add"
                             element={<AddUser />}
                         />
+                        <Route
+                            path="/dashboard/users/edit/:id"
+                            element={<EditUser />}
+                        />
                     </>
                 )}
 
-                <Route
-                    path="/dashboard/settings"
-                    element=""
-                />
+                <Route path="/dashboard/settings" element="" />
             </Routes>
         </div>
     );

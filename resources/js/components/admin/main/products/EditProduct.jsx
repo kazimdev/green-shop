@@ -38,7 +38,6 @@ const EditProduct = () => {
 
                 console.log(product);
 
-
                 setValue("title", product.title);
                 setValue("description", product.description);
                 setValue("slug", product.slug);

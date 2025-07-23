@@ -43,6 +43,25 @@ class UserController extends Controller
         return response()->json($user, 201);
     }
 
+    public function update(Request $request, User $user)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'role' => 'nullable|string',
+            'password' => 'required|min:6',
+        ]);
+
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'role' => $request->role,
+            'password' => Hash::make($request->password),
+        ]);
+
+        return response()->json($user);
+    }
+
     // DELETE /api/users/{id}
     public function destroy($id)
     {
