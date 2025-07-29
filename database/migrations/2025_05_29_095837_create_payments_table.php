@@ -17,6 +17,7 @@ class CreatePaymentsTable extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
             $table->string('payment_method');
+            $table->string('amount');
             $table->enum('status', ['pending', 'completed', 'failed'])->default('pending');
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();

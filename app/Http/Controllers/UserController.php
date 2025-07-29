@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -45,10 +46,16 @@ class UserController extends Controller
         return redirect()->route('users')->with('success-message', 'User created successfully!');
     }
 
-    public function destroy($id) {
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function destroy($id)
+    {
         $deleted = User::destroy($id);
 
-        if($deleted){
+        if ($deleted) {
             return redirect()->route('users')->with('success-message', 'User deleted successfully!');
         }
     }

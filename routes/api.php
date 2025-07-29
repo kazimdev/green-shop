@@ -3,9 +3,11 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,9 +33,55 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::apiResource('categories', CategoryController::class);
 });
 
+// Order Routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('orders', OrderController::class)->only([
+        'index',
+        'store',
+        'show'
+    ]);
+});
+
+
+//API Auth Routes
 Route::middleware('auth')->post('/logout', function (Request $request) {
     Auth::logout();
     $request->session()->invalidate();
     $request->session()->regenerateToken();
     return response()->json(['message' => 'Logged out']);
+});
+
+Route::post('/token/login', function (Request $request) {
+    $validator = Validator::make($request->all(), [
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'errors' => $validator->errors()
+        ], 422);
+    }
+
+    if (!Auth::attempt($request->only('email', 'password'))) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid credentials'
+        ], 401);
+    }
+
+    $token = $request->user()->createToken('login-token')->plainTextToken;
+
+    return response()->json([
+        'success' => true,
+        'token' => $token,
+        'user' => $request->user(),
+    ]);
+});
+
+Route::middleware('auth:sanctum')->post('/token/logout', function (Request $request) {
+    $request->user()->currentAccessToken()->delete();
+
+    return response()->json(['message' => 'Token logged out']);
 });
