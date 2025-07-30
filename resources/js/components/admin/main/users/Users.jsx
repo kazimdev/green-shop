@@ -82,7 +82,7 @@ const Users = () => {
                 User Filters{" "}
             </div>
 
-            <div className="products-list  bg-white px-4 py-3 shadow-sm mb-4 rounded-sm">
+            <div className="list-table  bg-white px-4 py-3 shadow-sm mb-4 rounded-sm">
                 <table className="table-auto w-full text-left">
                     <thead>
                         <tr>

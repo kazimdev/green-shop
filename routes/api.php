@@ -34,16 +34,19 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 });
 
 // Order Routes
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('orders', OrderController::class)->only([
         'index',
         'store',
-        'show'
+        'show',
+        'update',
+        'destroy'
     ]);
 });
 
 
 //API Auth Routes
+//Logout
 Route::middleware('auth')->post('/logout', function (Request $request) {
     Auth::logout();
     $request->session()->invalidate();
@@ -51,6 +54,7 @@ Route::middleware('auth')->post('/logout', function (Request $request) {
     return response()->json(['message' => 'Logged out']);
 });
 
+// Login
 Route::post('/token/login', function (Request $request) {
     $validator = Validator::make($request->all(), [
         'email' => ['required', 'email'],

@@ -26,9 +26,11 @@
     background: #459256;
     border: 0;
 }
-input, textarea, select {
+input,
+textarea,
+select {
     font-size: 15px;
-    color: #161A20;
+    color: #161a20;
 }
 header {
     min-height: 60px;
@@ -70,23 +72,23 @@ li.parent-cat {
     width: 100%;
     background: #f0f0f0;
 }
-.products-list table thead th,
-.products-list table tbody td {
+.list-table table thead th,
+.list-table table tbody td {
     padding: 10px 15px;
 }
-.products-list table tbody tr:nth-child(n) {
+.list-table table tbody tr:nth-child(n) {
     background: #f4f4f4;
 }
-.products-list table tbody tr:nth-child(2n) {
+.list-table table tbody tr:nth-child(2n) {
     background: #ffffff;
 }
-.products-list table td.actions a {
+.list-table table td.actions a {
     display: inline-block;
 }
 .add-product-form label span {
     display: inline-block;
     width: 180px;
 }
-form.add-product-form .label .relative input{
+form.add-product-form .label .relative input {
     width: 100%;
 }

@@ -14,7 +14,13 @@ class OrderController extends Controller
 {
     public function index()
     {
-        return Auth::user()->orders()->with('items.product', 'payment')->latest()->get();
+        $query = Order::with('items.product', 'payment');
+
+        if (!Auth::user()->is_admin) {
+            $query->where('user_id', Auth::id());
+        }
+
+        return $query->latest()->get();
     }
 
     public function store(Request $request)
@@ -23,7 +29,7 @@ class OrderController extends Controller
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
-            'payment_method' => 'required|in:cod',
+            'payment_method' => 'required|in:cod,bacs,card,paypal',
         ]);
 
         return DB::transaction(function () use ($validated) {
@@ -65,5 +71,27 @@ class OrderController extends Controller
     {
         $this->authorize('view', $order);
         return $order->load('items.product', 'payment');
+    }
+
+
+    public function update(Request $request, Order $order)
+    {
+        $this->authorize('update', $order);
+
+        $validated = $request->validate([
+            'status' => 'in:pending,processing,completed,canceled',
+        ]);
+
+        $order->update($validated);
+
+        return response()->json(['message' => 'Order updated', 'order' => $order]);
+    }
+
+    public function destroy(Order $order)
+    {
+        $this->authorize('delete', $order);
+        $order->delete();
+
+        return response()->json(['message' => 'Order deleted successfully']);
     }
 }

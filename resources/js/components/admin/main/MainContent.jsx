@@ -10,6 +10,7 @@ import Categories from "./categories/Categories";
 import useAuthRedirect from "../../hooks/useAuthRedirect";
 import axios from "../../auth/axios";
 import EditUser from "./users/EditUser";
+import Orders from "./orders/Orders";
 
 const MainContent = () => {
     useAuthRedirect();
@@ -49,6 +50,9 @@ const MainContent = () => {
                             path="/dashboard/categories"
                             element={<Categories />}
                         />
+
+                        <Route path="/dashboard/orders" element={<Orders />} />
+
                         <Route path="/dashboard/users" element={<Users />} />
                         <Route
                             path="/dashboard/users/add"
