@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Loader from "../../../ui/Loader";
 import axios from "../../../auth/axios";
+import Loader from "../../../components/ui/Loader";
 
 const Orders = () => {
     const [loading, setLoading] = useState(true);

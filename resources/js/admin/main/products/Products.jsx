@@ -1,35 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Loader from "../../../ui/Loader";
+import Loader from "../../../components/ui/Loader";
 import axios from "../../../auth/axios";
+import useProducts from "../../../hooks/useProducts";
 
 const Products = () => {
     const [loading, setLoading] = useState(true);
-    const [products, setProducts] = useState([]);
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                // Call Sanctum CSRF endpoint first
-                await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie", {
-                    withCredentials: true,
-                });
-
-                const response = await axios.get(
-                    "http://127.0.0.1:8000/api/products",
-                    {
-                        withCredentials: true,
-                    }
-                );
-                setProducts(response.data.data || response.data);
-                setLoading(false);
-            } catch (error) {
-                console.error("Failed to fetch products:", error);
-                setLoading(false);
-            }
-        };
-        fetchProducts();
-    }, []);
+    const [products, setProducts] = useProducts();
 
     const getPrimaryImageUrl = (images) => {
         const primary = images?.find((img) => img.is_primary);
@@ -94,7 +72,7 @@ const Products = () => {
                 <div className="max-h-[76vh] overflow-hidden overflow-y-auto">
                     <table className="table-auto w-full text-left">
                         <tbody>
-                            {loading ? (
+                            {!products.length ? (
                                 <tr>
                                     <td colSpan="8" className="text-center">
                                         <Loader />

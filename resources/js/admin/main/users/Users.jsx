@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Loader from "../../../ui/Loader";
+import Loader from "../../../components/ui/Loader";
 import axios from "../../../auth/axios";
 
 const Users = () => {

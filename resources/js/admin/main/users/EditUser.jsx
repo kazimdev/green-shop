@@ -1,21 +1,12 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import axios from "../../../auth/axios";
-import Alert from "../../../ui/Alert";
-import Loader from "../../../ui/Loader";
+import Alert from "../../../components/ui/Alert";
+import Loader from "../../../components/ui/Loader";
 
-const AddUser = () => {
-    const {
-        register,
-        handleSubmit,
-        reset,
-        formState: { errors },
-    } = useForm();
-
-    const [loading, setLoading] = React.useState(false);
-    const [success, setSuccess] = React.useState(false);
-    const [validationErrors, setValidationErrors] = React.useState({});
+const EditUser = () => {
+    const { id } = useParams();
 
     const roleOptions = [
         { value: "admin", label: "Admin" },
@@ -27,26 +18,99 @@ const AddUser = () => {
         { value: "user", label: "User" },
     ];
 
+    const [validationErrors, setValidationErrors] = useState({});
+    const [success, setSuccess] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        reset,
+        formState: { errors },
+    } = useForm();
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            setLoading(true);
+            try {
+                const res = await axios.get(
+                    `http://127.0.0.1:8000/api/users/${id}`
+                );
+                const user = res.data;
+
+                console.log(user);
+
+                setValue("name", user.name);
+                setValue("email", user.email);
+                setValue("role", user.role);
+                setValue("password", user.password);
+            } catch (err) {
+                console.error("Failed to fetch user", err);
+            }
+
+            setLoading(false);
+        };
+        fetchUser();
+    }, [id, setValue]);
+
     const onSubmit = async (data) => {
         setLoading(true);
         setValidationErrors({});
+        const formData = new FormData();
+
+        // Handle form fields - only append if they have meaningful values
+        const userFields = ["name", "email", "role", "password"];
+
+        userFields.forEach((field) => {
+            if (
+                data[field] !== undefined &&
+                data[field] !== null &&
+                data[field] !== ""
+            ) {
+                formData.append(field, data[field]);
+            }
+        });
+
+        // Add method spoofing for PUT request
+        formData.append("_method", "PUT");
+
+        // Get CSRF token
         try {
             await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie", {
                 withCredentials: true,
             });
+        } catch (err) {
+            console.error("CSRF token fetch failed", err);
+        }
+
+        try {
             const response = await axios.post(
-                "http://127.0.0.1:8000/api/users",
-                data,
+                `http://127.0.0.1:8000/api/users/${id}`,
+                formData,
                 {
                     withCredentials: true,
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
                 }
             );
+
+            console.log("User updated successfully:", response.data);
             setSuccess(true);
-            reset();
+
+            // Optional: Navigate back to users list after successful update
+            // setTimeout(() => navigate("/dashboard/users"), 2000);
         } catch (err) {
             setSuccess(false);
+            console.error("User update error:", err);
+
             if (err.response?.status === 422) {
-                setValidationErrors(err.response.data.errors);
+                const laravelErrors = err.response.data.errors;
+                setValidationErrors(laravelErrors);
+                console.error("Backend validation errors:", laravelErrors);
+            } else if (err.response?.data?.message) {
+                setValidationErrors({ general: [err.response.data.message] });
             } else {
                 setValidationErrors({
                     general: ["An unexpected error occurred"],
@@ -73,9 +137,7 @@ const AddUser = () => {
             </Link>
 
             <div className="users-form bg-white px-4 py-3 shadow-sm mb-4 rounded-sm">
-                <h2 className="block text-2xl font-bold p-3 mb-2">
-                    Add New User
-                </h2>
+                <h2 className="block text-2xl font-bold p-3 mb-2">Edit User</h2>
                 <form
                     className="add-user-form p-3"
                     onSubmit={handleSubmit(onSubmit)}
@@ -184,17 +246,20 @@ const AddUser = () => {
                     <input
                         type="submit"
                         className="text-white btn btn-soft btn-info my-4 max-w-48"
-                        value={loading ? "Adding..." : "Add User"}
+                        value={loading ? "Processing..." : "Update User"}
                         disabled={loading}
                     />
                 </form>
                 {loading && <Loader />}
                 {success && (
-                    <Alert type="success" message="User added successfully!" />
+                    <Alert
+                        type="success"
+                        message="User updated successfully!"
+                    />
                 )}
             </div>
         </>
     );
 };
 
-export default AddUser;
+export default EditUser;

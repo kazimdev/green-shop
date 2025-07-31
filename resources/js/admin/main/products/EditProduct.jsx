@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "../../../auth/axios";
-import Alert from "../../../ui/Alert";
-import Loader from "../../../ui/Loader";
+import Alert from "../../../components/ui/Alert";
+import Loader from "../../../components/ui/Loader";
 import useCategoryTree from "../../../hooks/useCategoryTree";
 
 const EditProduct = () => {

@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import axios from "../../../auth/axios";
-import Alert from "../../../ui/Alert";
-import Loader from "../../../ui/Loader";
+import Alert from "../../../components/ui/Alert";
+import Loader from "../../../components/ui/Loader";
 import useCategoryTree from "../../../hooks/useCategoryTree";
 
 const AddProduct = () => {
@@ -90,7 +90,7 @@ const AddProduct = () => {
                 formData.append(key, data[key]);
             }
         });
-        
+
         // Always append selectedCategories as categories[]
         selectedCategories.forEach((catId) => {
             formData.append("categories[]", catId);

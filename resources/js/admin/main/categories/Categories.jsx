@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Loader from "../../../ui/Loader";
+import Loader from "../../../components/ui/Loader";
 import axios from ".././../../auth/axios";
 import useCategoryTree from "../../../hooks/useCategoryTree";
 
