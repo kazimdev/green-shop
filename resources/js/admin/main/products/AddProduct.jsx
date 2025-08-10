@@ -154,7 +154,7 @@ const AddProduct = () => {
                 <form
                     action=""
                     method="post"
-                    className="add-product-form p-3"
+                    className="item-add-form p-3"
                     onSubmit={handleSubmit((data) =>
                         onSubmit({ ...data, categories: selectedCategories })
                     )}

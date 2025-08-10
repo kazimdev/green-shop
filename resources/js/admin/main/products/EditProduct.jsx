@@ -253,7 +253,7 @@ const EditProduct = () => {
                     Edit Product
                 </h2>
                 <form
-                    className="add-product-form p-3"
+                    className="item-add-form p-3"
                     onSubmit={handleSubmit(onSubmit)}
                 >
                     <div className="flex gap-6">

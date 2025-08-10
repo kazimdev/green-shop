@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -28,9 +29,36 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request)
     {
+        $validator = Validator::make($request->all(), [
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid credentials'
+            ], 401);
+        }
+
         $request->authenticate();
 
         $request->session()->regenerate();
+
+        $token = $request->user()->createToken('login-token')->plainTextToken;
+
+        // return response()->json([
+        //     'success' => true,
+        //     'token' => $token,
+        //     'user' => $request->user(),
+        // ]);
 
         return redirect()->intended(RouteServiceProvider::HOME);
     }

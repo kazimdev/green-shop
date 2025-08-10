@@ -11,6 +11,7 @@ import useAuthRedirect from "../../hooks/useAuthRedirect";
 import axios from "../../auth/axios";
 import EditUser from "./users/EditUser";
 import Orders from "./orders/Orders";
+import AddOrder from "./orders/AddOrder";
 
 const MainContent = () => {
     useAuthRedirect();
@@ -52,6 +53,10 @@ const MainContent = () => {
                         />
 
                         <Route path="/dashboard/orders" element={<Orders />} />
+                        <Route
+                            path="/dashboard/orders/add"
+                            element={<AddOrder />}
+                        />
 
                         <Route path="/dashboard/users" element={<Users />} />
                         <Route

@@ -85,10 +85,10 @@ li.parent-cat {
 .list-table table td.actions a {
     display: inline-block;
 }
-.add-product-form label span {
+.item-add-form label span {
     display: inline-block;
     width: 180px;
 }
-form.add-product-form .label .relative input {
+form.item-add-form .label .relative input {
     width: 100%;
 }
