@@ -1,6 +1,10 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import axios from "../../../auth/axios";
+import Loader from "../../../components/ui/Loader";
+import Alert from "../../../components/ui/Alert";
+import useUsers from "../../../hooks/useUsers";
 
 const AddOrder = () => {
     const {
@@ -10,6 +14,45 @@ const AddOrder = () => {
         reset,
         formState: { errors },
     } = useForm();
+
+    const [submitText, setSubmitText] = React.useState("Create Order");
+
+    const [loading, setLoading] = React.useState(false);
+    const [success, setSuccess] = React.useState(false);
+
+    const [users, setUsers] = useUsers();
+
+    const onSubmit = async (data) => {
+        setLoading(true);
+
+        data.items = [
+            { product_id: 1, quantity: 2 },
+            { product_id: 5, quantity: 1 },
+        ];
+
+        try {
+            await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie", {
+                withCredentials: true,
+            });
+
+            const response = await axios.post(
+                "http://127.0.0.1:8000/api/orders",
+                data,
+                {
+                    withCredentials: true,
+                }
+            );
+
+            setSuccess(true);
+            setLoading(false);
+            reset();
+            setSubmitText("Update Order");
+        } catch (err) {
+            console.log(err);
+            setSuccess(false);
+            setLoading(false);
+        }
+    };
 
     return (
         <>
@@ -31,7 +74,12 @@ const AddOrder = () => {
                     Add New Order
                 </h2>
 
-                <form action="" method="post" className="item-add-form">
+                <form
+                    action=""
+                    method="post"
+                    className="item-add-form"
+                    onSubmit={handleSubmit(onSubmit)}
+                >
                     <div className="flex gap-6">
                         <fieldset className="fieldset order-info w-1/2">
                             <label htmlFor="status" className="label mb-4">
@@ -42,11 +90,9 @@ const AddOrder = () => {
                                         id="status"
                                         className="select bg-base-light"
                                         {...register("status")}
-                                        defaultValue="active"
+                                        defaultValue="pending"
                                     >
-                                        <option value="pending" selected>
-                                            Pending
-                                        </option>
+                                        <option value="pending">Pending</option>
                                         <option value="processing">
                                             Processing
                                         </option>
@@ -63,19 +109,43 @@ const AddOrder = () => {
                                 </div>
                             </label>
 
-                            <label htmlFor="customer" className="label mb-4">
+                            <label htmlFor="customer_id" className="label mb-4">
                                 <span className="text-base">Customer:</span>
 
                                 <div className="w-3/4">
                                     <select
-                                        id="customer"
+                                        id="customer_id"
                                         className="select bg-base-light"
-                                        {...register("customer")}
+                                        {...register("customer_id")}
                                         defaultValue="active"
                                     >
-                                        <option value="guest" selected>
-                                            Guest
+                                        {users.length && users.map(user => {
+                                            return <option value={user.id}>{user.name}</option>
+                                        })}
+
+                                    </select>
+                                </div>
+                            </label>
+
+                            <label
+                                htmlFor="payment_method"
+                                className="label mb-4"
+                            >
+                                <span className="text-base">
+                                    Payment Method:
+                                </span>
+
+                                <div className="w-3/4">
+                                    <select
+                                        id="payment_method"
+                                        className="select bg-base-light"
+                                        {...register("payment_method")}
+                                        defaultValue="cod"
+                                    >
+                                        <option value="cod">
+                                            Cash on Delivery
                                         </option>
+                                        <option value="card">Card</option>
                                     </select>
                                 </div>
                             </label>
@@ -85,9 +155,14 @@ const AddOrder = () => {
                     <input
                         type="submit"
                         className="text-white btn btn-soft btn-info my-4 max-w-48"
-                        value="Create Order"
+                        value={submitText}
                     />
                 </form>
+
+                {loading && <Loader />}
+                {success && (
+                    <Alert type="success" message="Order added successfully!" />
+                )}
             </div>
         </>
     );

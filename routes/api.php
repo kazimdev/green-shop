@@ -51,12 +51,13 @@ Route::middleware('auth')->post('/logout', function (Request $request) {
     Auth::logout();
     $request->session()->invalidate();
     $request->session()->regenerateToken();
-    $request->user()->currentAccessToken()->delete();
 
     return response()->json(['message' => 'Logged out']);
 });
 
-// Login
+
+// Outsider App Login/Logout
+// Token Login
 Route::post('/token/login', function (Request $request) {
     $validator = Validator::make($request->all(), [
         'email' => ['required', 'email'],

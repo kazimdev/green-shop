@@ -30,11 +30,16 @@ class OrderController extends Controller
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
             'payment_method' => 'required|in:cod,bacs,card,paypal',
+            'customer_id' => 'nullable|integer'
         ]);
 
         return DB::transaction(function () use ($validated) {
+            $user = Auth::user();
+            $customerId = $user->is_admin ? ($validated['customer_id'] ?? null) : $user->id;
+
             $order = Order::create([
-                'user_id' => Auth::id(),
+                'user_id' => $user->id,
+                'customer_id' => $customerId,
                 'status' => 'pending',
                 'total_amount' => 0,
             ]);

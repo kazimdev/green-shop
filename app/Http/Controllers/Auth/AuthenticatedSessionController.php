@@ -60,6 +60,8 @@ class AuthenticatedSessionController extends Controller
         //     'user' => $request->user(),
         // ]);
 
+        session(['login-token' => $token, 'user' => $request->user()]);
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 

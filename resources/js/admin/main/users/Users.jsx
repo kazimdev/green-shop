@@ -2,34 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Loader from "../../../components/ui/Loader";
 import axios from "../../../auth/axios";
+import useUsers from "../../../hooks/useUsers";
 
 const Users = () => {
     const [loading, setLoading] = useState(true);
-    const [users, setUsers] = useState([]);
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                // Call Sanctum CSRF endpoint first
-                await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie", {
-                    withCredentials: true,
-                });
-
-                const response = await axios.get(
-                    "http://127.0.0.1:8000/api/users",
-                    {
-                        withCredentials: true,
-                    }
-                );
-                setUsers(response.data.data || response.data);
-                setLoading(false);
-            } catch (error) {
-                console.error("Failed to fetch Users:", error);
-                setLoading(false);
-            }
-        };
-        fetchUsers();
-    }, []);
+    const [users, setUsers] = useUsers();
 
     const handleDelete = async (e, id) => {
         e.preventDefault();
@@ -94,7 +72,7 @@ const Users = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
+                        {!users.length ? (
                             <tr>
                                 <td colSpan="8" className="text-center">
                                     <Loader />
