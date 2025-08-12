@@ -26,10 +26,19 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
+// Public Routes
+Route::get('/products', [ProductController::class, 'index']);
+
+
 // Admin CRUD Routes
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::apiResource('users', UserController::class);
-    Route::apiResource('products', ProductController::class);
+    Route::apiResource('products', ProductController::class)->only([
+        'store',
+        'show',
+        'update',
+        'destroy'
+    ]);
     Route::apiResource('categories', CategoryController::class);
 });
 

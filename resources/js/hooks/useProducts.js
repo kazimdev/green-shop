@@ -8,11 +8,6 @@ const useProducts = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                // Call Sanctum CSRF endpoint first
-                await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie", {
-                    withCredentials: true,
-                });
-
                 const response = await axios.get(
                     "http://127.0.0.1:8000/api/products",
                     {

@@ -3,6 +3,10 @@ import useProducts from "../../hooks/useProducts";
 
 const FeaturedProducts = () => {
     const [products, setProducts] = useProducts();
+    if(!products.length){
+        return;
+    }
+    
     return (
         <div className="row bg-white">
             <div className="container py-16 flex gap-5 flex-wrap">
