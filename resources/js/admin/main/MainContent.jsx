@@ -12,6 +12,7 @@ import axios from "../../auth/axios";
 import EditUser from "./users/EditUser";
 import Orders from "./orders/Orders";
 import AddOrder from "./orders/AddOrder";
+import EditOrder from "./orders/EditOrder";
 
 const MainContent = () => {
     useAuthRedirect();
@@ -56,6 +57,10 @@ const MainContent = () => {
                         <Route
                             path="/dashboard/orders/add"
                             element={<AddOrder />}
+                        />
+                        <Route
+                            path="/dashboard/orders/edit/:id"
+                            element={<EditOrder />}
                         />
 
                         <Route path="/dashboard/users" element={<Users />} />

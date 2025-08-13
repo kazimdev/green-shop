@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
@@ -25,71 +27,59 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.quantity' => 'required|integer|min:1',
-            'payment_method' => 'required|in:cod,bacs,card,paypal',
-            'customer_id' => 'nullable|integer'
-        ]);
+        $validated = $this->validateStoreRequest($request);
 
         return DB::transaction(function () use ($validated) {
-            $user = Auth::user();
-            $customerId = $user->is_admin ? ($validated['customer_id'] ?? null) : $user->id;
+            $order = $this->createOrder($validated);
+            $total = $this->createOrderItems($order, $validated['items']);
+            $this->updateOrderTotal($order, $total);
+            $this->createPayment($order, $validated['payment_method'], $total);
 
-            $order = Order::create([
-                'user_id' => $user->id,
-                'customer_id' => $customerId,
-                'status' => 'pending',
-                'total_amount' => 0,
-            ]);
-
-            $total = 0;
-
-            foreach ($validated['items'] as $item) {
-                $product = \App\Models\Product::findOrFail($item['product_id']);
-                $subtotal = $product->price * $item['quantity'];
-                $total += $subtotal;
-
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'quantity' => $item['quantity'],
-                    'price' => $product->price,
-                ]);
-            }
-
-            $order->update(['total_amount' => $total]);
-
-            Payment::create([
-                'order_id' => $order->id,
-                'payment_method' => $validated['payment_method'],
-                'status' => 'pending',
-                'amount' => $total,
-            ]);
-
-            return $order->load('items.product', 'payment');
+            return response()->json($order->load('items.product', 'payment'), 201);
         });
     }
 
     public function show(Order $order)
     {
         $this->authorize('view', $order);
+
         return $order->load('items.product', 'payment');
     }
-
 
     public function update(Request $request, Order $order)
     {
         $this->authorize('update', $order);
+        $validated = $this->validateUpdateRequest($request);
 
-        $validated = $request->validate([
-            'status' => 'in:pending,processing,completed,canceled',
-        ]);
+        DB::transaction(function () use ($order, $validated) {
+            if (isset($validated['items'])) {
+                $this->updateOrderItems($order, $validated['items']);
+            }
 
-        $order->update($validated);
+            if (isset($validated['status'])) {
+                $order->status = $validated['status'];
+            }
+            
+            if (isset($validated['customer_id'])) {
+                $order->customer_id = $validated['customer_id'];
+            }
 
-        return response()->json(['message' => 'Order updated', 'order' => $order]);
+            $order->save();
+            
+            if (isset($validated['payment_method'])) {
+                $order->payment()->update(['payment_method' => $validated['payment_method']]);
+            }
+            
+            if (isset($validated['items'])) {
+                $newTotal = $order->items->sum(function ($item) {
+                    return $item->price * $item->quantity;
+                });
+                $this->updateOrderTotal($order, $newTotal);
+                $order->payment()->update(['amount' => $newTotal]);
+            }
+        });
+
+        return response()->json(['message' => 'Order updated', 'order' => $order->load('items.product', 'payment')]);
     }
 
     public function destroy(Order $order)
@@ -98,5 +88,101 @@ class OrderController extends Controller
         $order->delete();
 
         return response()->json(['message' => 'Order deleted successfully']);
+    }
+
+    // Private helper methods
+
+    private function validateStoreRequest(Request $request)
+    {
+        return $request->validate([
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'payment_method' => 'required|in:cod,bacs,card,paypal',
+            'customer_id' => 'nullable|integer|exists:users,id'
+        ]);
+    }
+
+    private function validateUpdateRequest(Request $request)
+    {
+        return $request->validate([
+            'items' => 'sometimes|array',
+            'items.*.product_id' => 'required_with:items|exists:products,id',
+            'items.*.quantity' => 'required_with:items|integer|min:1',
+            'payment_method' => 'sometimes|in:cod,bacs,card,paypal',
+            'customer_id' => 'sometimes|nullable|integer|exists:users,id',
+            'status' => ['sometimes', Rule::in(['pending', 'processing', 'completed', 'cancelled'])],
+        ]);
+    }
+
+    private function createOrder(array $validated): Order
+    {
+        $user = Auth::user();
+        $customerId = $user->is_admin ? ($validated['customer_id'] ?? null) : $user->id;
+
+        return Order::create([
+            'user_id' => $user->id,
+            'customer_id' => $customerId,
+            'status' => 'pending',
+            'total_amount' => 0,
+        ]);
+    }
+
+    private function createOrderItems(Order $order, array $items): float
+    {
+        $total = 0;
+        foreach ($items as $item) {
+            $product = Product::findOrFail($item['product_id']);
+            $this->checkStock($product, $item['quantity']);
+            $product->decrement('stock', $item['quantity']);
+            $subtotal = $product->price * $item['quantity'];
+            $total += $subtotal;
+
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $product->id,
+                'quantity' => $item['quantity'],
+                'price' => $product->price,
+            ]);
+        }
+        return $total;
+    }
+
+    private function updateOrderItems(Order $order, array $items)
+    {
+        // Return stock for the old items.
+        foreach ($order->items as $item) {
+            Product::find($item->product_id)?->increment('stock', $item->quantity);
+        }
+
+        // Delete old items.
+        $order->items()->delete();
+
+        // Add new items
+        $this->createOrderItems($order, $items);
+    }
+
+    private function updateOrderTotal(Order $order, float $total)
+    {
+        $order->update(['total_amount' => $total]);
+    }
+
+    private function createPayment(Order $order, string $paymentMethod, float $total)
+    {
+        Payment::create([
+            'order_id' => $order->id,
+            'payment_method' => $paymentMethod,
+            'status' => 'pending',
+            'amount' => $total,
+        ]);
+    }
+
+    private function checkStock(Product $product, int $quantity)
+    {
+        if ($product->stock < $quantity) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'items' => "Not enough stock for product: {$product->title}. Available: {$product->stock}.",
+            ]);
+        }
     }
 }

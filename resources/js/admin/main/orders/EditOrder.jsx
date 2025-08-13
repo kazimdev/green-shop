@@ -1,49 +1,69 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import axios from "../../../auth/axios";
 import Loader from "../../../components/ui/Loader";
 import Alert from "../../../components/ui/Alert";
 import useUsers from "../../../hooks/useUsers";
-import useProducts from "../../../hooks/useProducts";
 import AddItem from "../../../components/ui/AddItem";
 import ValidationErrors from "../../../components/ui/ValidationErrors";
 
-const AddOrder = () => {
+const EditOrder = () => {
+    const { id } = useParams();
     const {
         register,
         handleSubmit,
         setValue,
-        reset,
         formState: { errors },
     } = useForm();
 
-    const [submitText, setSubmitText] = useState("Create Order");
-
-    const [loading, setLoading] = useState(false);
+    const [submitText, setSubmitText] = useState("Update Order");
+    const [loading, setLoading] = useState(true);
     const [success, setSuccess] = useState(false);
     const [validationErrors, setValidationErrors] = useState({});
-
-    const [users, setUsers] = useUsers();
+    const [users] = useUsers(); // users are fetched here
+    const [items, setItems] = useState([]);
+    const [orderData, setOrderData] = useState(null); // New state to store fetched order
 
     useEffect(() => {
-        if (users.length) {
-            setValue("customer_id", users[0].id);
+        const fetchOrder = async () => {
+            try {
+                const response = await axios.get(
+                    `http://127.0.0.1:8000/api/orders/${id}`,
+                    {
+                        withCredentials: true,
+                    }
+                );
+                setOrderData(response.data); // Store fetched order data
+                setLoading(false);
+            } catch (error) {
+                console.error("Failed to fetch order:", error);
+                setLoading(false);
+            }
+        };
+
+        if (id) {
+            fetchOrder();
         }
-    }, [users, setValue]);
+    }, [id]); // Only depends on id
 
-    const [products, setProducts] = useProducts();
+    useEffect(() => {
+        // This useEffect runs when orderData or users change
+        if (orderData && users.length > 0) {
+            setValue("status", orderData.status);
+            setValue("customer_id", orderData.customer_id);
+            setValue("payment_method", orderData.payment.payment_method);
+            // console.log(orderData.items);
 
-    const selectableProducts = products.length
-        ? products
-              .filter((product) => product.price && product.stock != 0)
-              .map((product) => ({
-                  value: product.id,
-                  label: product.title,
-              }))
-        : [];
-
-    const [items, setItems] = useState([{ product_id: null, quantity: 1 }]);
+            setItems(
+                orderData.items.map((item) => ({
+                    product_id: item.product_id,
+                    quantity: item.quantity,
+                    price: item.price,
+                }))
+            );
+        }
+    }, [orderData, users, setValue]); // Depends on orderData and users
 
     const handleAddItem = () => {
         setItems((prev) => [...prev, { product_id: null, quantity: 1 }]);
@@ -54,6 +74,7 @@ const AddOrder = () => {
         setValidationErrors({});
 
         if (!items.length) {
+            setLoading(false);
             return;
         }
 
@@ -66,19 +87,12 @@ const AddOrder = () => {
                 withCredentials: true,
             });
 
-            const response = await axios.post(
-                "http://127.0.0.1:8000/api/orders",
-                data,
-                {
-                    withCredentials: true,
-                }
-            );
+            await axios.put(`http://127.0.0.1:8000/api/orders/${id}`, data, {
+                withCredentials: true,
+            });
 
             setSuccess(true);
             setLoading(false);
-            reset();
-            setItems([{ product_id: null, quantity: 1 }]);
-            setSubmitText("Update Order");
         } catch (err) {
             if (err.response?.status === 422) {
                 setValidationErrors(err.response.data.errors);
@@ -92,8 +106,8 @@ const AddOrder = () => {
         }
     };
 
-    if (!users.length) {
-        <Loader />;
+    if (loading) {
+        return <Loader />;
     }
 
     return (
@@ -113,7 +127,7 @@ const AddOrder = () => {
 
             <div className="orders-form bg-white px-4 py-3 shadow-sm mb-4 rounded-sm">
                 <h2 className="block text-2xl font-bold p-3 mb-2">
-                    Add New Order
+                    Edit Order
                 </h2>
 
                 <form
@@ -135,6 +149,7 @@ const AddOrder = () => {
                                         items={items}
                                         setItems={setItems}
                                     ></AddItem>
+
                                     <button
                                         type="button"
                                         className="btn btn-sm btn-success mt-2"
@@ -153,7 +168,6 @@ const AddOrder = () => {
                                         id="status"
                                         className="select bg-base-light"
                                         {...register("status")}
-                                        defaultValue="pending"
                                     >
                                         <option value="pending">Pending</option>
                                         <option value="processing">
@@ -180,7 +194,6 @@ const AddOrder = () => {
                                         id="customer_id"
                                         className="select bg-base-light"
                                         {...register("customer_id")}
-                                        defaultValue={users[0]?.id}
                                     >
                                         {users.length &&
                                             users.map((user) => {
@@ -210,7 +223,6 @@ const AddOrder = () => {
                                         id="payment_method"
                                         className="select bg-base-light"
                                         {...register("payment_method")}
-                                        defaultValue="cod"
                                     >
                                         <option value="cod">
                                             Cash on Delivery
@@ -231,13 +243,15 @@ const AddOrder = () => {
 
                 <ValidationErrors errors={validationErrors}></ValidationErrors>
 
-                {loading && <Loader />}
                 {success && (
-                    <Alert type="success" message="Order added successfully!" />
+                    <Alert
+                        type="success"
+                        message="Order updated successfully!"
+                    />
                 )}
             </div>
         </>
     );
 };
 
-export default AddOrder;
+export default EditOrder;
