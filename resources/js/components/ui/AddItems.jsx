@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Select from "react-select";
 import useProducts from "../../hooks/useProducts";
 
-const AddItem = ({ items, setItems }) => {
+const AddItems = ({ items, setItems }) => {
         const [products] = useProducts();
         const selectableProducts = products.length
         ? products
@@ -15,9 +15,17 @@ const AddItem = ({ items, setItems }) => {
 
     const handleItemChange = (index, field, value) => {
         setItems((prev) =>
-            prev.map((item, i) =>
-                i === index ? { ...item, [field]: value } : item
-            )
+            prev.map((item, i) => {
+                if (i === index) {
+                    const updatedItem = { ...item, [field]: value };
+                    if (field === "product_id") {
+                        const product = products.find((p) => p.id === value);
+                        updatedItem.price = product ? product.price : 0;
+                    }
+                    return updatedItem;
+                }
+                return item;
+            })
         );
     };
 
@@ -26,7 +34,7 @@ const AddItem = ({ items, setItems }) => {
     };
 
     return items.map((item, idx) => (
-        <div key={idx} className="flex items-center gap-2 mb-2">
+        <div key={idx} className="flex items-center justify-between gap-2 mb-2">
             <Select
                 options={selectableProducts}
                 value={
@@ -37,8 +45,9 @@ const AddItem = ({ items, setItems }) => {
                 onChange={(opt) =>
                     handleItemChange(idx, "product_id", opt ? opt.value : null)
                 }
+                styles={`max-width:100px`}
             />
-            <span>${item.price}</span>
+            <span className="item-price">${item.price}</span>
             <button
                 type="button"
                 className="btn btn-sm btn-outline"
@@ -86,4 +95,4 @@ const AddItem = ({ items, setItems }) => {
     ));
 };
 
-export default AddItem;
+export default AddItems;

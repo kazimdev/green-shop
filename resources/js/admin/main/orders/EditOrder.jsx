@@ -5,7 +5,7 @@ import axios from "../../../auth/axios";
 import Loader from "../../../components/ui/Loader";
 import Alert from "../../../components/ui/Alert";
 import useUsers from "../../../hooks/useUsers";
-import AddItem from "../../../components/ui/AddItem";
+import AddItems from "../../../components/ui/AddItems";
 import ValidationErrors from "../../../components/ui/ValidationErrors";
 
 const EditOrder = () => {
@@ -145,10 +145,10 @@ const EditOrder = () => {
                                 <span className="text-base">Items:</span>
 
                                 <div className="items-holder">
-                                    <AddItem
+                                    <AddItems
                                         items={items}
                                         setItems={setItems}
-                                    ></AddItem>
+                                    ></AddItems>
 
                                     <button
                                         type="button"

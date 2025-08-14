@@ -6,7 +6,7 @@ import Loader from "../../../components/ui/Loader";
 import Alert from "../../../components/ui/Alert";
 import useUsers from "../../../hooks/useUsers";
 import useProducts from "../../../hooks/useProducts";
-import AddItem from "../../../components/ui/AddItem";
+import AddItems from "../../../components/ui/AddItems";
 import ValidationErrors from "../../../components/ui/ValidationErrors";
 
 const AddOrder = () => {
@@ -43,10 +43,10 @@ const AddOrder = () => {
               }))
         : [];
 
-    const [items, setItems] = useState([{ product_id: null, quantity: 1 }]);
+    const [items, setItems] = useState([{ product_id: null, quantity: 1, price: null }]);
 
     const handleAddItem = () => {
-        setItems((prev) => [...prev, { product_id: null, quantity: 1 }]);
+        setItems((prev) => [...prev, { product_id: null, quantity: 1, price: null }]);
     };
 
     const onSubmit = async (data) => {
@@ -77,7 +77,7 @@ const AddOrder = () => {
             setSuccess(true);
             setLoading(false);
             reset();
-            setItems([{ product_id: null, quantity: 1 }]);
+            setItems([{ product_id: null, quantity: 1, price: null }]);
             setSubmitText("Update Order");
         } catch (err) {
             if (err.response?.status === 422) {
@@ -131,10 +131,10 @@ const AddOrder = () => {
                                 <span className="text-base">Items:</span>
 
                                 <div className="items-holder">
-                                    <AddItem
+                                    <AddItems
                                         items={items}
                                         setItems={setItems}
-                                    ></AddItem>
+                                    ></AddItems>
                                     <button
                                         type="button"
                                         className="btn btn-sm btn-success mt-2"

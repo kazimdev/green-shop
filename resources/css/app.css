@@ -92,3 +92,12 @@ li.parent-cat {
 form.item-add-form .label .relative input {
     width: 100%;
 }
+.css-b62m3t-container {
+    width: 320px;
+}
+.item-add-form label span {
+    background: transparent;
+}
+.item-add-form label span.item-price {
+    width: 80px;
+}

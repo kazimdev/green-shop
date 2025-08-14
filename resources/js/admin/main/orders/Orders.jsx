@@ -8,10 +8,12 @@ const Orders = () => {
     const [loading, setLoading] = useState(true);
     const [orders, setOrders] = useState([]);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10);
+
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                // Call Sanctum CSRF endpoint first
                 await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie", {
                     withCredentials: true,
                 });
@@ -32,9 +34,25 @@ const Orders = () => {
         fetchOrders();
     }, []);
 
-    console.log(orders);
+    const handleDelete = async (e, id) => {
+        e.preventDefault();
+        if (window.confirm("Are you sure you want to delete this order?")) {
+            try {
+                await axios.delete(`http://127.0.0.1:8000/api/orders/${id}`, {
+                    withCredentials: true,
+                });
+                setOrders(orders.filter((order) => order.id !== id));
+            } catch (error) {
+                console.error("Failed to delete order:", error);
+            }
+        }
+    };
 
-    const handleDelete = (e, id) => {};
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentOrders = orders.slice(indexOfFirstItem, indexOfLastItem);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
         <>
@@ -76,10 +94,17 @@ const Orders = () => {
                                 </td>
                             </tr>
                         ) : (
-                            orders.map((order) => {
+                            currentOrders.map((order) => {
                                 return (
                                     <tr key={order.id}>
-                                        <td>#{order.id}</td>
+                                        <td>
+                                            <Link
+                                                to={`/dashboard/orders/${order.id}`}
+                                                className="edit mr-3 underline"
+                                            >
+                                                #{order.id}
+                                            </Link>
+                                        </td>
                                         <td>
                                             {order.created_at
                                                 ? new Date(
@@ -100,6 +125,17 @@ const Orders = () => {
 
                                         <td className="actions text-right">
                                             <Link
+                                                to={`/dashboard/orders/${order.id}`}
+                                                className="edit mr-3"
+                                            >
+                                                <img
+                                                    src="/icons/preview.svg"
+                                                    alt="Edit"
+                                                    width={16}
+                                                    height={16}
+                                                />
+                                            </Link>
+                                            <Link
                                                 to={`/dashboard/orders/edit/${order.id}`}
                                                 className="edit mr-3"
                                             >
@@ -110,16 +146,6 @@ const Orders = () => {
                                                     height={16}
                                                 />
                                             </Link>
-
-                                            <button className="preview mr-3">
-                                                {" "}
-                                                <img
-                                                    src="/icons/preview.svg"
-                                                    alt="Preview"
-                                                    width={16}
-                                                    height={16}
-                                                />
-                                            </button>
 
                                             <button
                                                 onClick={(e) =>
@@ -141,6 +167,22 @@ const Orders = () => {
                         )}
                     </tbody>
                 </table>
+            </div>
+            <div className="pagination flex justify-end gap-2">
+                <button
+                    className="btn"
+                    onClick={() => paginate(currentPage - 1)}
+                    disabled={currentPage === 1}
+                >
+                    Previous
+                </button>
+                <button
+                    className="btn"
+                    onClick={() => paginate(currentPage + 1)}
+                    disabled={currentOrders.length < itemsPerPage}
+                >
+                    Next
+                </button>
             </div>
         </>
     );

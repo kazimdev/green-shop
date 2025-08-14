@@ -13,6 +13,7 @@ import EditUser from "./users/EditUser";
 import Orders from "./orders/Orders";
 import AddOrder from "./orders/AddOrder";
 import EditOrder from "./orders/EditOrder";
+import ViewOrder from "./orders/ViewOrder";
 
 const MainContent = () => {
     useAuthRedirect();
@@ -61,6 +62,10 @@ const MainContent = () => {
                         <Route
                             path="/dashboard/orders/edit/:id"
                             element={<EditOrder />}
+                        />
+                        <Route
+                            path="/dashboard/orders/:id"
+                            element={<ViewOrder />}
                         />
 
                         <Route path="/dashboard/users" element={<Users />} />
