@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Order;
@@ -29,10 +30,17 @@ class OrderController extends Controller
     {
         $validated = $this->validateStoreRequest($request);
 
-        return DB::transaction(function () use ($validated) {
-            $order = $this->createOrder($validated);
+        return DB::transaction(function () use ($validated, $request) {
+            $customer = $this->createCustomer($request->user(), $validated);
+
+            $customer_id = isset($customer['id']) ? $customer['id'] : 0;
+
+            $order = $this->createOrder($customer_id);
+
             $total = $this->createOrderItems($order, $validated['items']);
+
             $this->updateOrderTotal($order, $total);
+
             $this->createPayment($order, $validated['payment_method'], $total);
 
             return response()->json($order->load('items.product', 'payment'), 201);
@@ -59,17 +67,17 @@ class OrderController extends Controller
             if (isset($validated['status'])) {
                 $order->status = $validated['status'];
             }
-            
+
             if (isset($validated['customer_id'])) {
                 $order->customer_id = $validated['customer_id'];
             }
 
             $order->save();
-            
+
             if (isset($validated['payment_method'])) {
                 $order->payment()->update(['payment_method' => $validated['payment_method']]);
             }
-            
+
             if (isset($validated['items'])) {
                 $newTotal = $order->items->sum(function ($item) {
                     return $item->price * $item->quantity;
@@ -90,8 +98,7 @@ class OrderController extends Controller
         return response()->json(['message' => 'Order deleted successfully']);
     }
 
-    // Private helper methods
-
+    // Private Helper Methods
     private function validateStoreRequest(Request $request)
     {
         return $request->validate([
@@ -99,7 +106,10 @@ class OrderController extends Controller
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
             'payment_method' => 'required|in:cod,bacs,card,paypal',
-            'customer_id' => 'nullable|integer|exists:users,id'
+            'customer_id' => 'required|integer',
+            'customer_phone' => 'string|nullable',
+            'billing_address' => 'array|nullable',
+            'shipping_address' => 'array|nullable',
         ]);
     }
 
@@ -115,10 +125,21 @@ class OrderController extends Controller
         ]);
     }
 
-    private function createOrder(array $validated): Order
+    private function createCustomer($user, array $customerData): Customer
+    {
+        // logger($customerData);
+
+        return Customer::create([
+            'user_id' => $customerData['customer_id'] ?? $user->id,
+            'phone' => $customerData['customer_phone'] ?? '',
+            'billing_address' => $customerData['billing_address'] ?? '',
+            'shipping_address' => $customerData['shipping_address'] ?? '',
+        ]);
+    }
+
+    private function createOrder(int $customerId): Order
     {
         $user = Auth::user();
-        $customerId = $user->is_admin ? ($validated['customer_id'] ?? null) : $user->id;
 
         return Order::create([
             'user_id' => $user->id,

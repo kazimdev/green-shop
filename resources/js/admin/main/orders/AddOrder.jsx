@@ -80,6 +80,8 @@ const AddOrder = () => {
             setItems([{ product_id: null, quantity: 1, price: null }]);
             setSubmitText("Update Order");
         } catch (err) {
+            console.log(err);
+
             if (err.response?.status === 422) {
                 setValidationErrors(err.response.data.errors);
             } else {

@@ -34,6 +34,12 @@ const Products = () => {
         setLoading(false);
     };
 
+    useEffect(function () {
+        if (products.length == 0) {
+            setLoading(false);
+        }
+    });
+
     return (
         <>
             <div className="content-header mb-4">
@@ -72,10 +78,16 @@ const Products = () => {
                 <div className="max-h-[76vh] overflow-hidden overflow-y-auto">
                     <table className="table-auto w-full text-left">
                         <tbody>
-                            {!products.length ? (
+                            {loading ? (
                                 <tr>
                                     <td colSpan="8" className="text-center">
                                         <Loader />
+                                    </td>
+                                </tr>
+                            ) : products.length === 0 ? (
+                                <tr>
+                                    <td colSpan="8" className="text-center">
+                                        No Products Found.
                                     </td>
                                 </tr>
                             ) : (
@@ -83,7 +95,6 @@ const Products = () => {
                                     const imageUrl = getPrimaryImageUrl(
                                         product.images || []
                                     );
-
                                     return (
                                         <tr key={product.id}>
                                             <td>#{product.id}</td>
@@ -132,7 +143,6 @@ const Products = () => {
                                                         height={16}
                                                     />
                                                 </Link>
-
                                                 <button className="preview mr-3">
                                                     {" "}
                                                     <img
@@ -142,7 +152,6 @@ const Products = () => {
                                                         height={16}
                                                     />
                                                 </button>
-
                                                 <button
                                                     onClick={(e) =>
                                                         handleDelete(
