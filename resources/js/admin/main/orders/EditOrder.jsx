@@ -49,10 +49,14 @@ const EditOrder = () => {
 
     useEffect(() => {
         // This useEffect runs when orderData or users change
+        if (!orderData) {
+            setLoading(true);
+        }
+
         if (orderData && users.length > 0) {
             setValue("status", orderData.status);
-            setValue("customer_id", orderData.customer_id);
-            setValue("payment_method", orderData.payment.payment_method);
+            setValue("customer_id", parseInt(orderData?.customer?.user_id));
+            setValue("payment_method", orderData?.payment?.payment_method);
             // console.log(orderData.items);
 
             setItems(
@@ -199,8 +203,10 @@ const EditOrder = () => {
                                             users.map((user) => {
                                                 return (
                                                     <option
-                                                        key={user.id}
-                                                        value={user.id}
+                                                        key={parseInt(user.id)}
+                                                        value={parseInt(
+                                                            user.id
+                                                        )}
                                                     >
                                                         {user.name}
                                                     </option>

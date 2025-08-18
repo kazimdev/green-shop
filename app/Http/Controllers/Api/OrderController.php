@@ -31,11 +31,11 @@ class OrderController extends Controller
         $validated = $this->validateStoreRequest($request);
 
         return DB::transaction(function () use ($validated, $request) {
-            $customer = $this->createCustomer($request->user(), $validated);
+            $customer = $this->findOrCreateCustomer($request->user(), $validated);
 
-            $customer_id = isset($customer['id']) ? $customer['id'] : 0;
+            logger($customer);
 
-            $order = $this->createOrder($customer_id);
+            $order = $this->createOrder($customer->id);
 
             $total = $this->createOrderItems($order, $validated['items']);
 
@@ -51,7 +51,7 @@ class OrderController extends Controller
     {
         $this->authorize('view', $order);
 
-        return $order->load('items.product', 'payment');
+        return $order->load('items.product', 'payment', 'customer');
     }
 
     public function update(Request $request, Order $order)
@@ -106,7 +106,7 @@ class OrderController extends Controller
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
             'payment_method' => 'required|in:cod,bacs,card,paypal',
-            'customer_id' => 'required|integer',
+            'customer_id' => 'nullable|integer',
             'customer_phone' => 'string|nullable',
             'billing_address' => 'array|nullable',
             'shipping_address' => 'array|nullable',
@@ -125,16 +125,16 @@ class OrderController extends Controller
         ]);
     }
 
-    private function createCustomer($user, array $customerData): Customer
+    private function findOrCreateCustomer($user, array $customerData): Customer
     {
-        // logger($customerData);
-
-        return Customer::create([
-            'user_id' => $customerData['customer_id'] ?? $user->id,
-            'phone' => $customerData['customer_phone'] ?? '',
-            'billing_address' => $customerData['billing_address'] ?? '',
-            'shipping_address' => $customerData['shipping_address'] ?? '',
-        ]);
+        return Customer::firstOrCreate(
+            ['user_id' => $customerData['customer_id'] ?? $user->id],
+            [
+                'phone' => $customerData['customer_phone'] ?? '',
+                'billing_address' => $customerData['billing_address'] ?? '',
+                'shipping_address' => $customerData['shipping_address'] ?? '',
+            ]
+        );
     }
 
     private function createOrder(int $customerId): Order
