@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "../auth/axios";
 
-const useUsers = () => {
+const useUsers = (route = 'users') => {
      const [users, setUsers] = useState([]);
 
     useEffect(() => {
@@ -13,7 +13,7 @@ const useUsers = () => {
                 });
 
                 const response = await axios.get(
-                    "http://127.0.0.1:8000/api/users",
+                    "http://127.0.0.1:8000/api/" + route,
                     {
                         withCredentials: true,
                     }

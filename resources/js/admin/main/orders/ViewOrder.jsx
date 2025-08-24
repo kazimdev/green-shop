@@ -73,7 +73,7 @@ const ViewOrder = () => {
                         <span className="font-bold">Order Status:</span> {orderData.status}
                     </div>
                     <div className="mb-4">
-                        <span className="font-bold">Customer:</span> {getCustomerName(orderData.customer_id)}
+                        <span className="font-bold">Customer:</span> {getCustomerName(orderData?.customer?.user_id)}
                     </div>
                     <div className="mb-4">
                         <span className="font-bold">Payment Method:</span> {orderData.payment.payment_method}

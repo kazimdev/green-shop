@@ -30,7 +30,7 @@ const Sidebar = () => {
             .then((res) => setUser(res.data))
             .catch(() => setUser(null));
     }, []);
-    
+
     const isAdmin = user && (user.role === "admin" || user.role === "Admin");
 
     const routes = {
@@ -40,7 +40,7 @@ const Sidebar = () => {
             "/dashboard/categories": "Categories",
             "/dashboard/orders": "Orders",
             "/dashboard/customers": "Customers",
-            "/dashboard/users": "Our staffs",
+            "/dashboard/users": "Users",
         }),
         "/dashboard/settings": "Settings",
     };

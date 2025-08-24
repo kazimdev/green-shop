@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\OrderController;
 
 /*
@@ -40,6 +41,8 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
         'destroy'
     ]);
     Route::apiResource('categories', CategoryController::class);
+
+    Route::get('/customers', [CustomerController::class, 'index']);
 });
 
 // Order Routes
